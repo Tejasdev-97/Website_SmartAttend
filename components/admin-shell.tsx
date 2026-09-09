@@ -11,57 +11,57 @@ import {
 
 // ─── Design Tokens (mirrors globals.css) ──────────────────────────────────────
 export const C = {
-  navy:          '#071B49',
-  navyDark:      '#09204F',
-  blue:          '#0B5CFF',
-  blueBright:    '#1264F5',
-  blueLight:     '#EAF3FF',
-  blueFaint:     '#F5F9FF',
-  pageBg:        '#F7FBFF',
-  border:        '#D9E4F2',
-  textPrimary:   '#071B49',
+  navy: '#071B49',
+  navyDark: '#09204F',
+  blue: '#0B5CFF',
+  blueBright: '#1264F5',
+  blueLight: '#EAF3FF',
+  blueFaint: '#F5F9FF',
+  pageBg: '#ffffffff',
+  border: '#D9E4F2',
+  textPrimary: '#071B49',
   textSecondary: '#243B64',
-  textTertiary:  '#526887',
-  green:         '#16A34A',
-  greenLight:    '#E8F8EF',
-  orange:        '#F59E0B',
-  orangeLight:   '#FFF4DE',
-  red:           '#EF4444',
-  redLight:      '#FDECEC',
-  purple:        '#6C3FF5',
-  purpleLight:   '#F1ECFF',
-  white:         '#FFFFFF',
+  textTertiary: '#526887',
+  green: '#16A34A',
+  greenLight: '#E8F8EF',
+  orange: '#F59E0B',
+  orangeLight: '#FFF4DE',
+  red: '#EF4444',
+  redLight: '#FDECEC',
+  purple: '#6C3FF5',
+  purpleLight: '#F1ECFF',
+  white: '#FFFFFF',
 } as const
 
 // ─── Navigation definition ────────────────────────────────────────────────────
 const primaryNav = [
-  { label: 'Dashboard',           href: '/admin/dashboard',       icon: LayoutDashboard },
-  { label: 'Students',            href: '/admin/students',        icon: GraduationCap   },
-  { label: 'Faculty',             href: '/admin/faculty',         icon: Users            },
-  { label: 'Academic Master',     href: '/admin/academic-master', icon: BookOpen         },
-  { label: 'Timetable',           href: '/admin/timetable',       icon: CalendarDays     },
-  { label: 'Reports & Analytics', href: '/admin/reports',         icon: BarChart3        },
+  { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+  { label: 'Students', href: '/admin/students', icon: GraduationCap },
+  { label: 'Faculty', href: '/admin/faculty', icon: Users },
+  { label: 'Academic Master', href: '/admin/academic-master', icon: BookOpen },
+  { label: 'Timetable', href: '/admin/timetable', icon: CalendarDays },
+  { label: 'Reports & Analytics', href: '/admin/reports', icon: BarChart3 },
 ]
 
 const moreNav = [
-  { label: 'Live Attendance',       href: '/admin/attendance',       icon: Activity        },
-  { label: 'BLE Beacons & Devices', href: '/admin/devices',          icon: Radio        },
-  { label: 'Bulk Update',           href: '/admin/bulk-update',      icon: RefreshCcw   },
-  { label: 'Users & Roles',         href: '/admin/users',            icon: UserCog      },
-  { label: 'Audit Logs',            href: '/admin/audit-logs',       icon: ClipboardList},
-  { label: 'Settings',              href: '/admin/settings',         icon: Settings     },
-  { label: 'Timetable Import',      href: '/admin/timetable/import', icon: CalendarDays },
-  { label: 'Timetable Publish',     href: '/admin/timetable/publish',icon: CalendarDays },
+  { label: 'Live Attendance', href: '/admin/attendance', icon: Activity },
+  { label: 'BLE Beacons & Devices', href: '/admin/devices', icon: Radio },
+  { label: 'Bulk Update', href: '/admin/bulk-update', icon: RefreshCcw },
+  { label: 'Users & Roles', href: '/admin/users', icon: UserCog },
+  { label: 'Audit Logs', href: '/admin/audit-logs', icon: ClipboardList },
+  { label: 'Settings', href: '/admin/settings', icon: Settings },
+  { label: 'Timetable Import', href: '/admin/timetable/import', icon: CalendarDays },
+  { label: 'Timetable Publish', href: '/admin/timetable/publish', icon: CalendarDays },
 ]
 
 // ─── AdminShell ───────────────────────────────────────────────────────────────
 export function AdminShell({ children }: { children: React.ReactNode }) {
-  const router   = useRouter()
+  const router = useRouter()
   const pathname = usePathname()
-  const [mobileOpen,  setMobileOpen]  = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const [moreOpen,    setMoreOpen]    = useState(false)
-  const [notifOpen,   setNotifOpen]   = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
 
   const isActive = (href: string) =>
     pathname === href || (href !== '/admin/dashboard' && pathname.startsWith(href))
@@ -74,7 +74,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* ── Top Navigation Bar ───────────────────────────────────────────── */}
       <header
         className="sticky top-0 z-40 w-full bg-white"
-        style={{ borderBottom: `1px solid ${C.border}`, boxShadow: '0 1px 0 #D9E4F2' }}
+        style={{ borderBottom: `1px solid ${C.border}`, boxShadow: '0 1px 0 #dfe8f5ff' }}
       >
         <div className="mx-auto flex h-16 max-w-[1440px] w-full items-center justify-between gap-2 xl:gap-4 px-4 sm:px-6 lg:px-8">
 
@@ -106,8 +106,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   className="relative flex items-center gap-1 px-2.5 xl:px-3 py-1.5 rounded-lg text-[12.5px] xl:text-[13.5px] font-medium transition-all whitespace-nowrap shadow-xs"
                   style={{
-                    color:      active ? C.white : C.navy,
-                    background: active ? C.blue  : 'transparent',
+                    color: active ? C.white : C.navy,
+                    background: active ? C.blue : 'transparent',
                     fontWeight: active ? 600 : 500,
                   }}
                   onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLAnchorElement).style.color = C.blue; (e.currentTarget as HTMLAnchorElement).style.background = C.blueFaint } }}
@@ -124,8 +124,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 onClick={() => setMoreOpen(!moreOpen)}
                 className="flex items-center gap-1 px-2.5 xl:px-3 py-1.5 rounded-lg text-[12.5px] xl:text-[13.5px] transition-all whitespace-nowrap"
                 style={{
-                  color:      isMoreActive ? C.white : C.navy,
-                  background: isMoreActive ? C.blue  : 'transparent',
+                  color: isMoreActive ? C.white : C.navy,
+                  background: isMoreActive ? C.blue : 'transparent',
                   fontWeight: isMoreActive ? 600 : 500,
                 }}
               >
@@ -155,7 +155,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                           onClick={() => setMoreOpen(false)}
                           className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors"
                           style={{
-                            color:      active ? C.blue      : C.textSecondary,
+                            color: active ? C.blue : C.textSecondary,
                             background: active ? C.blueLight : 'transparent',
                             fontWeight: active ? 600 : 400,
                           }}
@@ -351,7 +351,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors"
                     style={{
-                      color:      active ? C.blue      : C.textSecondary,
+                      color: active ? C.blue : C.textSecondary,
                       background: active ? C.blueLight : 'transparent',
                       fontWeight: active ? 600 : 400,
                     }}
@@ -461,11 +461,11 @@ export function StatusBadge({
   tone?: 'green' | 'red' | 'blue' | 'orange' | 'navy' | 'purple'
 }) {
   const styles: Record<string, { bg: string; text: string; border: string }> = {
-    green:  { bg: '#E8F8EF', text: '#14532D', border: '#BBF7D0' },
-    red:    { bg: '#FDECEC', text: '#991B1B', border: '#FECACA' },
-    blue:   { bg: '#EAF3FF', text: '#1E40AF', border: '#BFDBFE' },
+    green: { bg: '#E8F8EF', text: '#14532D', border: '#BBF7D0' },
+    red: { bg: '#FDECEC', text: '#991B1B', border: '#FECACA' },
+    blue: { bg: '#EAF3FF', text: '#1E40AF', border: '#BFDBFE' },
     orange: { bg: '#FFF4DE', text: '#92400E', border: '#FED7AA' },
-    navy:   { bg: '#F5F9FF', text: '#243B64', border: '#D9E4F2' },
+    navy: { bg: '#F5F9FF', text: '#243B64', border: '#D9E4F2' },
     purple: { bg: '#F1ECFF', text: '#4C1D95', border: '#DDD6FE' },
   }
   const s = styles[tone]

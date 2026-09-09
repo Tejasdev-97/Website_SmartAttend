@@ -60,7 +60,7 @@ function Inp({
           paddingRight: suffix ? '2.75rem' : '0.75rem',
         }}
         onFocus={e => { e.currentTarget.style.borderColor = C.blue; e.currentTarget.style.boxShadow = `0 0 0 3px rgba(11,92,255,0.10)` }}
-        onBlur={e =>  { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = 'none' }}
+        onBlur={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = 'none' }}
       />
       {suffix && (
         <span className="absolute right-3.5 top-1/2 -translate-y-1/2" style={{ color: C.textTertiary }}>
@@ -84,7 +84,7 @@ function Sel({ value, onChange, options, placeholder }: {
       className="h-11 w-full appearance-none rounded-lg border bg-white px-3 text-sm outline-none transition-all"
       style={{ borderColor: C.border, color: C.textPrimary }}
       onFocus={e => { e.currentTarget.style.borderColor = C.blue }}
-      onBlur={e =>  { e.currentTarget.style.borderColor = C.border }}
+      onBlur={e => { e.currentTarget.style.borderColor = C.border }}
     >
       {placeholder && <option value="">{placeholder}</option>}
       {options.map(o => <option key={o} value={o}>{o}</option>)}
@@ -95,12 +95,12 @@ function Sel({ value, onChange, options, placeholder }: {
 // ─── Login Page ───────────────────────────────────────────────────────────────
 export function LoginPage() {
   const router = useRouter()
-  const [show, setShow]         = useState(false)
-  const [id, setId]             = useState('')
+  const [show, setShow] = useState(false)
+  const [id, setId] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError]       = useState('')
-  const [notice, setNotice]     = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const [loading, setLoading] = useState(false)
 
   function login(e: React.FormEvent) {
     e.preventDefault()
@@ -115,9 +115,9 @@ export function LoginPage() {
   }
 
   const features = [
-    { icon: Shield,          title: 'Secure & Reliable',         desc: 'Your data is always protected.' },
-    { icon: SlidersHorizontal, title: 'Effortless Management',   desc: 'Manage students, faculty and academics with ease.' },
-    { icon: GraduationCap,   title: 'Built for Modern Campuses', desc: 'Technology that simplifies everyday tasks.' },
+    { icon: Shield, title: 'Secure & Reliable', desc: 'Your data is always protected.' },
+    { icon: SlidersHorizontal, title: 'Effortless Management', desc: 'Manage students, faculty and academics with ease.' },
+    { icon: GraduationCap, title: 'Built for Modern Campuses', desc: 'Technology that simplifies everyday tasks.' },
   ]
 
   return (
@@ -317,21 +317,21 @@ export function LoginPage() {
 // ─── Dashboard Page ───────────────────────────────────────────────────────────
 type StatItem = { label: string; value: string; icon: React.ElementType; sub: string; accent?: boolean }
 const stats: StatItem[] = [
-  { label: 'Total Students',   value: '2,856', icon: GraduationCap,    sub: '+48 this semester'  },
-  { label: 'Total Faculty',    value: '156',   icon: Users,            sub: '12 departments'      },
-  { label: 'Active Classes',   value: '128',   icon: ClipboardList,    sub: 'This week'           },
-  { label: 'Avg. Attendance',  value: '82%',   icon: SlidersHorizontal,sub: 'Current semester', accent: true },
+  { label: 'Total Students', value: '2,856', icon: GraduationCap, sub: '+48 this semester' },
+  { label: 'Total Faculty', value: '156', icon: Users, sub: '12 departments' },
+  { label: 'Active Classes', value: '128', icon: ClipboardList, sub: 'This week' },
+  { label: 'Avg. Attendance', value: '82%', icon: SlidersHorizontal, sub: 'Current semester', accent: true },
 ]
 
 const quickActions = [
-  { title: 'Student Management',   href: '/admin/students',       icon: GraduationCap,  desc: 'Manage student records',        color: C.blue,   bg: C.blueLight   },
-  { title: 'Faculty Management',   href: '/admin/faculty',        icon: Users,          desc: 'Manage faculty profiles',       color: C.green,  bg: C.greenLight  },
-  { title: 'Timetable Management', href: '/admin/timetable',      icon: ClipboardList,  desc: 'Plan and manage classes',       color: C.purple, bg: C.purpleLight },
-  { title: 'Attendance Overview',  href: '/admin/reports',        icon: SlidersHorizontal, desc: 'View attendance data',       color: C.orange, bg: C.orangeLight },
-  { title: 'Reports & Analytics',  href: '/admin/reports',        icon: BarChart3,      desc: 'View institutional reports',    color: C.blue,   bg: C.blueFaint   },
-  { title: 'Users & Roles',        href: '/admin/users',          icon: UserCog,        desc: 'Manage system users',           color: C.navy,   bg: '#F4F8FD'     },
-  { title: 'Audit Logs',           href: '/admin/audit-logs',     icon: ClipboardList,  desc: 'Track admin activity',          color: C.navy,   bg: '#F4F8FD'     },
-  { title: 'System Settings',      href: '/admin/settings',       icon: Settings,       desc: 'Configure your console',        color: C.navy,   bg: '#F4F8FD'     },
+  { title: 'Student Management', href: '/admin/students', icon: GraduationCap, desc: 'Manage student records', color: C.blue, bg: C.blueLight },
+  { title: 'Faculty Management', href: '/admin/faculty', icon: Users, desc: 'Manage faculty profiles', color: C.green, bg: C.greenLight },
+  { title: 'Timetable Management', href: '/admin/timetable', icon: ClipboardList, desc: 'Plan and manage classes', color: C.purple, bg: C.purpleLight },
+  { title: 'Attendance Overview', href: '/admin/reports', icon: SlidersHorizontal, desc: 'View attendance data', color: C.orange, bg: C.orangeLight },
+  { title: 'Reports & Analytics', href: '/admin/reports', icon: BarChart3, desc: 'View institutional reports', color: C.blue, bg: C.blueFaint },
+  { title: 'Users & Roles', href: '/admin/users', icon: UserCog, desc: 'Manage system users', color: C.navy, bg: '#F4F8FD' },
+  { title: 'Audit Logs', href: '/admin/audit-logs', icon: ClipboardList, desc: 'Track admin activity', color: C.navy, bg: '#F4F8FD' },
+  { title: 'System Settings', href: '/admin/settings', icon: Settings, desc: 'Configure your console', color: C.navy, bg: '#F4F8FD' },
 ]
 
 export function DashboardPage() {
@@ -429,7 +429,7 @@ export function DashboardPage() {
                 <Link
                   key={action.title}
                   href={action.href}
-                  className="group flex flex-col justify-between rounded-xl p-5 min-h-[125px] transition-all hover:-translate-y-0.5"
+                  className="group flex flex-col justify-between rounded-xl p-5 min-h-[100px] transition-all hover:-translate-y-0.5"
                   style={{
                     background: C.white,
                     border: `1px solid ${C.border}`,
@@ -481,26 +481,26 @@ export function DashboardPage() {
 
 // ─── Students Page ────────────────────────────────────────────────────────────
 const students = [
-  { name: 'Rahul Sharma',  usn: '01CS123', dept: 'CSE', year: '3rd Year', section: 'CSE 3A', account: 'Active',   device: 'Linked'     },
-  { name: 'Ananya Singh',  usn: '01CS124', dept: 'CSE', year: '3rd Year', section: 'CSE 3A', account: 'Active',   device: 'Linked'     },
-  { name: 'Vikram Patel',  usn: '01CS125', dept: 'CSE', year: '3rd Year', section: 'CSE 3B', account: 'Active',   device: 'Linked'     },
-  { name: 'Neha Verma',    usn: '01CS126', dept: 'CSE', year: '3rd Year', section: 'CSE 3B', account: 'Inactive', device: 'Not Linked' },
-  { name: 'Arjun Kumar',   usn: '01CS127', dept: 'CSE', year: '3rd Year', section: 'CSE 3A', account: 'Active',   device: 'Linked'     },
-  { name: 'Ishita Rao',    usn: '01EC203', dept: 'ECE', year: '2nd Year', section: 'ECE 2A', account: 'Active',   device: 'Linked'     },
-  { name: 'Karan Shah',    usn: '01IT118', dept: 'IT',  year: '3rd Year', section: 'IT 3A',  account: 'Active',   device: 'Not Linked' },
+  { name: 'Rahul Sharma', usn: '01CS123', dept: 'CSE', year: '3rd Year', section: 'CSE 3A', account: 'Active', device: 'Linked' },
+  { name: 'Ananya Singh', usn: '01CS124', dept: 'CSE', year: '3rd Year', section: 'CSE 3A', account: 'Active', device: 'Linked' },
+  { name: 'Vikram Patel', usn: '01CS125', dept: 'CSE', year: '3rd Year', section: 'CSE 3B', account: 'Active', device: 'Linked' },
+  { name: 'Neha Verma', usn: '01CS126', dept: 'CSE', year: '3rd Year', section: 'CSE 3B', account: 'Inactive', device: 'Not Linked' },
+  { name: 'Arjun Kumar', usn: '01CS127', dept: 'CSE', year: '3rd Year', section: 'CSE 3A', account: 'Active', device: 'Linked' },
+  { name: 'Ishita Rao', usn: '01EC203', dept: 'ECE', year: '2nd Year', section: 'ECE 2A', account: 'Active', device: 'Linked' },
+  { name: 'Karan Shah', usn: '01IT118', dept: 'IT', year: '3rd Year', section: 'IT 3A', account: 'Active', device: 'Not Linked' },
 ]
 
 export function StudentsPage() {
   const router = useRouter()
-  const [query,      setQuery]      = useState('')
-  const [dept,       setDept]       = useState('')
-  const [status,     setStatus]     = useState('')
+  const [query, setQuery] = useState('')
+  const [dept, setDept] = useState('')
+  const [status, setStatus] = useState('')
   const [activePage, setActivePage] = useState(1)
 
   const filtered = useMemo(
     () => students.filter(s =>
       (s.name + s.usn).toLowerCase().includes(query.toLowerCase()) &&
-      (!dept   || s.dept    === dept)   &&
+      (!dept || s.dept === dept) &&
       (!status || s.account === status)
     ),
     [query, dept, status],
@@ -538,14 +538,14 @@ export function StudentsPage() {
               className="h-10 w-full rounded-lg border pl-10 pr-4 text-[13.5px] outline-none transition-all"
               style={{ borderColor: C.border, color: C.textPrimary }}
               onFocus={e => { e.currentTarget.style.borderColor = C.blue }}
-              onBlur={e =>  { e.currentTarget.style.borderColor = C.border }}
+              onBlur={e => { e.currentTarget.style.borderColor = C.border }}
             />
           </div>
-          <Sel value={dept}   onChange={setDept}   options={['CSE','ECE','IT','ME']} placeholder="Department" />
-          <Sel value=""       onChange={() => {}}   options={['1st Year','2nd Year','3rd Year','4th Year']} placeholder="Year" />
-          <Sel value=""       onChange={() => {}}   options={['1','2','3','4','5','6','7','8']} placeholder="Semester" />
-          <Sel value=""       onChange={() => {}}   options={['CSE 3A','CSE 3B','ECE 2A']} placeholder="Section" />
-          <Sel value={status} onChange={setStatus}  options={['Active','Inactive']} placeholder="Account Status" />
+          <Sel value={dept} onChange={setDept} options={['CSE', 'ECE', 'IT', 'ME']} placeholder="Department" />
+          <Sel value="" onChange={() => { }} options={['1st Year', '2nd Year', '3rd Year', '4th Year']} placeholder="Year" />
+          <Sel value="" onChange={() => { }} options={['1', '2', '3', '4', '5', '6', '7', '8']} placeholder="Semester" />
+          <Sel value="" onChange={() => { }} options={['CSE 3A', 'CSE 3B', 'ECE 2A']} placeholder="Section" />
+          <Sel value={status} onChange={setStatus} options={['Active', 'Inactive']} placeholder="Account Status" />
           <button
             onClick={() => { setQuery(''); setDept(''); setStatus('') }}
             className={secondaryButton}
@@ -573,7 +573,7 @@ export function StudentsPage() {
             <table className="w-full min-w-[780px] text-left">
               <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
                 <tr>
-                  {['#','Student','USN','Department','Year','Section','Account','Device','Actions'].map((h, i) => (
+                  {['#', 'Student', 'USN', 'Department', 'Year', 'Section', 'Account', 'Device', 'Actions'].map((h, i) => (
                     <th
                       key={h}
                       className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
@@ -683,10 +683,10 @@ export function StudentsPage() {
 
 // ─── Create Student Page ──────────────────────────────────────────────────────
 export function CreateStudentPage() {
-  const router  = useRouter()
+  const router = useRouter()
   const [created, setCreated] = useState(false)
-  const [copied,  setCopied]  = useState(false)
-  const [file,    setFile]    = useState('students_import_may2024.xlsx')
+  const [copied, setCopied] = useState(false)
+  const [file, setFile] = useState('students_import_may2024.xlsx')
   const [form, setForm] = useState({
     name: 'Sakshi Gupta', usn: '01CS128', gender: 'Female',
     mobile: '+91 98765 43210', email: '',
@@ -696,7 +696,7 @@ export function CreateStudentPage() {
   const tempPassword = `${form.usn}@SmartAttend`
 
   function copyPassword() {
-    navigator.clipboard.writeText(tempPassword).catch(() => {})
+    navigator.clipboard.writeText(tempPassword).catch(() => { })
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -752,7 +752,7 @@ export function CreateStudentPage() {
           <div className="space-y-5 min-w-0">
             <Panel title="Personal Information">
               <div className="grid gap-4 p-5 sm:grid-cols-2">
-                {([['name','Full Name',true],['usn','USN',true],['gender','Gender',true],['mobile','Mobile Number',false],['email','Email (Optional)',false]] as [string,string,boolean][]).map(([k,l,req]) => (
+                {([['name', 'Full Name', true], ['usn', 'USN', true], ['gender', 'Gender', true], ['mobile', 'Mobile Number', false], ['email', 'Email (Optional)', false]] as [string, string, boolean][]).map(([k, l, req]) => (
                   <label key={k} className="block">
                     <Label required={req}>{l}</Label>
                     <Inp value={form[k as keyof typeof form]} onChange={v => update(k, v)} />
@@ -765,15 +765,15 @@ export function CreateStudentPage() {
               <div className="grid gap-4 p-5 sm:grid-cols-2">
                 <label className="block">
                   <Label required>Department</Label>
-                  <Sel value={form.department} onChange={v => update('department', v)} options={['CSE','ECE','IT','ME','CE']} />
+                  <Sel value={form.department} onChange={v => update('department', v)} options={['CSE', 'ECE', 'IT', 'ME', 'CE']} />
                 </label>
                 <label className="block">
                   <Label required>Year</Label>
-                  <Sel value={form.year} onChange={v => update('year', v)} options={['1st Year','2nd Year','3rd Year','4th Year']} />
+                  <Sel value={form.year} onChange={v => update('year', v)} options={['1st Year', '2nd Year', '3rd Year', '4th Year']} />
                 </label>
                 <label className="block">
                   <Label required>Semester</Label>
-                  <Sel value={form.semester} onChange={v => update('semester', v)} options={['1','2','3','4','5','6','7','8']} />
+                  <Sel value={form.semester} onChange={v => update('semester', v)} options={['1', '2', '3', '4', '5', '6', '7', '8']} />
                 </label>
                 <label className="block">
                   <Label required>Section</Label>
@@ -857,19 +857,19 @@ export function CreateStudentPage() {
 
 // ─── Faculty Page ─────────────────────────────────────────────────────────────
 const faculty = [
-  { name: 'Prof. Rohit Sharma',  id: 'FAC123', dept: 'CSE', designation: 'Associate Prof.', classes: '8 Classes', status: 'Active'   },
-  { name: 'Prof. Neha Joshi',    id: 'FAC124', dept: 'CSE', designation: 'Assistant Prof.', classes: '6 Classes', status: 'Active'   },
-  { name: 'Prof. Amit Verma',    id: 'FAC125', dept: 'ECE', designation: 'Professor',       classes: '5 Classes', status: 'Active'   },
-  { name: 'Prof. Pooja Singh',   id: 'FAC126', dept: 'ME',  designation: 'Assistant Prof.', classes: '4 Classes', status: 'Inactive' },
-  { name: 'Prof. Rahul Mehta',   id: 'FAC127', dept: 'IT',  designation: 'Associate Prof.', classes: '3 Classes', status: 'Active'   },
-  { name: 'Prof. Sneha Reddy',   id: 'FAC128', dept: 'CSE', designation: 'Assistant Prof.', classes: '4 Classes', status: 'Active'   },
+  { name: 'Prof. Rohit Sharma', id: 'FAC123', dept: 'CSE', designation: 'Associate Prof.', classes: '8 Classes', status: 'Active' },
+  { name: 'Prof. Neha Joshi', id: 'FAC124', dept: 'CSE', designation: 'Assistant Prof.', classes: '6 Classes', status: 'Active' },
+  { name: 'Prof. Amit Verma', id: 'FAC125', dept: 'ECE', designation: 'Professor', classes: '5 Classes', status: 'Active' },
+  { name: 'Prof. Pooja Singh', id: 'FAC126', dept: 'ME', designation: 'Assistant Prof.', classes: '4 Classes', status: 'Inactive' },
+  { name: 'Prof. Rahul Mehta', id: 'FAC127', dept: 'IT', designation: 'Associate Prof.', classes: '3 Classes', status: 'Active' },
+  { name: 'Prof. Sneha Reddy', id: 'FAC128', dept: 'CSE', designation: 'Assistant Prof.', classes: '4 Classes', status: 'Active' },
 ]
 
-const greenFacultyColors = ['#1E40AF','#5B21B6','#166534','#92400E','#1E40AF','#5B21B6']
+const greenFacultyColors = ['#1E40AF', '#5B21B6', '#166534', '#92400E', '#1E40AF', '#5B21B6']
 
 export function FacultyPage() {
   const router = useRouter()
-  const [open,  setOpen]  = useState(false)
+  const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const filtered = faculty.filter(f =>
     (f.name + f.id).toLowerCase().includes(query.toLowerCase()),
@@ -901,12 +901,12 @@ export function FacultyPage() {
               className="h-10 w-full rounded-lg border pl-10 pr-4 text-[13.5px] outline-none transition-all"
               style={{ borderColor: C.border, color: C.textPrimary }}
               onFocus={e => { e.currentTarget.style.borderColor = C.blue }}
-              onBlur={e =>  { e.currentTarget.style.borderColor = C.border }}
+              onBlur={e => { e.currentTarget.style.borderColor = C.border }}
             />
           </div>
-          <Sel value="" onChange={() => {}} options={['CSE','ECE','IT','ME']} placeholder="Department" />
-          <Sel value="" onChange={() => {}} options={['Professor','Associate Prof.','Assistant Prof.']} placeholder="Designation" />
-          <Sel value="" onChange={() => {}} options={['Active','Inactive']} placeholder="Status" />
+          <Sel value="" onChange={() => { }} options={['CSE', 'ECE', 'IT', 'ME']} placeholder="Department" />
+          <Sel value="" onChange={() => { }} options={['Professor', 'Associate Prof.', 'Assistant Prof.']} placeholder="Designation" />
+          <Sel value="" onChange={() => { }} options={['Active', 'Inactive']} placeholder="Status" />
           <button onClick={() => setQuery('')} className={secondaryButton}>Reset</button>
         </div>
 
@@ -924,7 +924,7 @@ export function FacultyPage() {
             <table className="w-full min-w-[800px] text-left">
               <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
                 <tr>
-                  {['#','Faculty','Faculty ID','Department','Designation','Assigned Classes','Status','Actions'].map((h, i) => (
+                  {['#', 'Faculty', 'Faculty ID', 'Department', 'Designation', 'Assigned Classes', 'Status', 'Actions'].map((h, i) => (
                     <th
                       key={h}
                       className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
@@ -1012,10 +1012,10 @@ export function FacultyPage() {
               </div>
               <div className="grid gap-4 p-6 sm:grid-cols-2">
                 {([
-                  ['Faculty ID','FAC129',true],['Full Name','Prof. New Member',true],
-                  ['Department','CSE',true],['Designation','Assistant Prof.',true],
-                  ['Email','faculty@college.edu.in',true],['Mobile','+91 99876 54321',false],
-                ] as [string,string,boolean][]).map(([label, val, req]) => (
+                  ['Faculty ID', 'FAC129', true], ['Full Name', 'Prof. New Member', true],
+                  ['Department', 'CSE', true], ['Designation', 'Assistant Prof.', true],
+                  ['Email', 'faculty@college.edu.in', true], ['Mobile', '+91 99876 54321', false],
+                ] as [string, string, boolean][]).map(([label, val, req]) => (
                   <label key={label} className="block">
                     <Label required={req}>{label}</Label>
                     <Inp placeholder={val} />
