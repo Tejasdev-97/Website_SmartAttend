@@ -35,16 +35,16 @@ export const C = {
 
 // ─── Navigation definition ────────────────────────────────────────────────────
 const primaryNav = [
-  { label: 'Dashboard',         href: '/admin/dashboard',       icon: LayoutDashboard },
-  { label: 'Live Attendance',   href: '/admin/attendance',      icon: Activity        },
-  { label: 'Students',          href: '/admin/students',         icon: GraduationCap   },
-  { label: 'Faculty',           href: '/admin/faculty',          icon: Users            },
-  { label: 'Academic Master',   href: '/admin/academic-master',  icon: BookOpen         },
-  { label: 'Timetable',         href: '/admin/timetable',        icon: CalendarDays     },
-  { label: 'Reports & Analytics', href: '/admin/reports',        icon: BarChart3        },
+  { label: 'Dashboard',           href: '/admin/dashboard',       icon: LayoutDashboard },
+  { label: 'Students',            href: '/admin/students',        icon: GraduationCap   },
+  { label: 'Faculty',             href: '/admin/faculty',         icon: Users            },
+  { label: 'Academic Master',     href: '/admin/academic-master', icon: BookOpen         },
+  { label: 'Timetable',           href: '/admin/timetable',       icon: CalendarDays     },
+  { label: 'Reports & Analytics', href: '/admin/reports',         icon: BarChart3        },
 ]
 
 const moreNav = [
+  { label: 'Live Attendance',       href: '/admin/attendance',       icon: Activity        },
   { label: 'BLE Beacons & Devices', href: '/admin/devices',          icon: Radio        },
   { label: 'Bulk Update',           href: '/admin/bulk-update',      icon: RefreshCcw   },
   { label: 'Users & Roles',         href: '/admin/users',            icon: UserCog      },
@@ -97,29 +97,23 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           {/* Primary nav — desktop */}
-          <nav className="hidden lg:flex items-center justify-center gap-1 xl:gap-1.5 min-w-0">
+          <nav className="hidden lg:flex items-center justify-center gap-1 xl:gap-1.5 shrink-0">
             {primaryNav.map(item => {
               const active = isActive(item.href)
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative flex items-center gap-1 px-2 xl:px-3 py-1.5 rounded-lg text-[12.5px] xl:text-[13.5px] font-medium transition-colors whitespace-nowrap"
+                  className="relative flex items-center gap-1 px-2.5 xl:px-3 py-1.5 rounded-lg text-[12.5px] xl:text-[13.5px] font-medium transition-all whitespace-nowrap shadow-xs"
                   style={{
-                    color:      active ? C.blue   : C.navy,
-                    background: active ? C.blueLight : 'transparent',
+                    color:      active ? C.white : C.navy,
+                    background: active ? C.blue  : 'transparent',
                     fontWeight: active ? 600 : 500,
                   }}
                   onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLAnchorElement).style.color = C.blue; (e.currentTarget as HTMLAnchorElement).style.background = C.blueFaint } }}
                   onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLAnchorElement).style.color = C.navy; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent' } }}
                 >
                   {item.label}
-                  {active && (
-                    <span
-                      className="absolute -bottom-px left-2 right-2 h-0.5 rounded-full"
-                      style={{ background: C.blue }}
-                    />
-                  )}
                 </Link>
               )
             })}
@@ -128,10 +122,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="relative">
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="flex items-center gap-1 px-2 xl:px-3 py-1.5 rounded-lg text-[12.5px] xl:text-[13.5px] transition-colors whitespace-nowrap"
+                className="flex items-center gap-1 px-2.5 xl:px-3 py-1.5 rounded-lg text-[12.5px] xl:text-[13.5px] transition-all whitespace-nowrap"
                 style={{
-                  color:      isMoreActive ? C.blue      : C.navy,
-                  background: isMoreActive ? C.blueLight : 'transparent',
+                  color:      isMoreActive ? C.white : C.navy,
+                  background: isMoreActive ? C.blue  : 'transparent',
                   fontWeight: isMoreActive ? 600 : 500,
                 }}
               >
@@ -140,12 +134,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   className="size-3.5 transition-transform"
                   style={{ transform: moreOpen ? 'rotate(180deg)' : 'none' }}
                 />
-                {isMoreActive && (
-                  <span
-                    className="absolute -bottom-px left-2 right-2 h-0.5 rounded-full"
-                    style={{ background: C.blue }}
-                  />
-                )}
               </button>
               {moreOpen && (
                 <>
@@ -184,10 +172,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Right section */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Search */}
             <div
-              className="hidden md:flex items-center gap-2 h-9 rounded-lg px-2.5 w-28 lg:w-36 xl:w-48 shrink-0"
+              className="hidden md:flex items-center gap-2 h-9 rounded-lg px-2.5 w-28 lg:w-36 xl:w-44 shrink-0"
               style={{ border: `1px solid ${C.border}`, background: C.blueFaint }}
             >
               <Search className="size-3.5 shrink-0" style={{ color: C.textTertiary }} />
@@ -209,9 +197,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               >
                 <Bell className="size-[18px]" />
                 <span
-                  className="absolute right-1.5 top-1.5 size-2 rounded-full ring-2 ring-white"
+                  className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-bold leading-none text-white shadow-xs"
                   style={{ background: C.red }}
-                />
+                >
+                  3
+                </span>
               </button>
               {notifOpen && (
                 <>
@@ -254,7 +244,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="relative">
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-[#F5F9FF]"
+                className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition-colors hover:bg-[#F5F9FF] shrink-0 min-w-[130px]"
               >
                 <div
                   className="flex size-8 items-center justify-center rounded-full text-xs font-bold text-white shrink-0"
@@ -262,13 +252,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 >
                   AK
                 </div>
-                <div className="hidden xl:block text-left">
-                  <p className="text-[12.5px] font-semibold leading-tight" style={{ color: C.navy }}>
+                <div className="hidden sm:block text-left whitespace-nowrap shrink-0">
+                  <p className="text-[12.5px] font-semibold leading-tight whitespace-nowrap" style={{ color: C.navy }}>
                     Anita Kulkarni
                   </p>
-                  <p className="text-[11px] font-medium" style={{ color: C.textSecondary }}>Super Admin</p>
+                  <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: C.textSecondary }}>
+                    Super Admin
+                  </p>
                 </div>
-                <ChevronDown className="hidden sm:block size-3.5" style={{ color: C.textTertiary }} />
+                <ChevronDown className="hidden sm:block size-3.5 shrink-0" style={{ color: C.textTertiary }} />
               </button>
 
               {profileOpen && (

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  AlertCircle, ArrowLeft, BarChart3, Check, CheckCircle2,
+  AlertCircle, ArrowLeft, ArrowRight, BarChart3, Check, CheckCircle2,
   ClipboardList, Copy, Eye, EyeOff, FileSpreadsheet,
   GraduationCap, Info, LockKeyhole, MoreHorizontal, Plus,
   Search, Settings, Shield, SlidersHorizontal, Upload,
@@ -422,31 +422,45 @@ export function DashboardPage() {
         {/* Quick actions */}
         <div className="mt-8">
           <h2 className="mb-4 text-[15px] font-semibold" style={{ color: C.navy }}>Quick Actions</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {quickActions.map(action => {
               const Icon = action.icon
               return (
                 <Link
                   key={action.title}
                   href={action.href}
-                  className="flex items-center gap-3.5 rounded-xl p-4 transition-all hover:-translate-y-0.5"
+                  className="group flex flex-col justify-between rounded-xl p-5 min-h-[125px] transition-all hover:-translate-y-0.5"
                   style={{
                     background: C.white,
                     border: `1px solid ${C.border}`,
                     boxShadow: '0 2px 8px rgba(7,27,73,0.04)',
                   }}
-                  onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 4px 16px rgba(7,27,73,0.10)'}
-                  onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 2px 8px rgba(7,27,73,0.04)'}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLAnchorElement
+                    el.style.borderColor = C.blue
+                    el.style.boxShadow = '0 4px 16px rgba(11,92,255,0.12)'
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLAnchorElement
+                    el.style.borderColor = C.border
+                    el.style.boxShadow = '0 2px 8px rgba(7,27,73,0.04)'
+                  }}
                 >
-                  <div
-                    className="flex size-10 shrink-0 items-center justify-center rounded-lg"
-                    style={{ background: action.bg }}
-                  >
-                    <Icon className="size-[18px]" style={{ color: action.color }} />
+                  <div className="flex items-start gap-3.5">
+                    <div
+                      className="flex size-10 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105"
+                      style={{ background: action.bg }}
+                    >
+                      <Icon className="size-[18px]" style={{ color: action.color }} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[14px] font-semibold leading-snug" style={{ color: C.navy }}>{action.title}</p>
+                      <p className="mt-1 text-[12px] leading-relaxed" style={{ color: C.textSecondary }}>{action.desc}</p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>{action.title}</p>
-                    <p className="mt-0.5 text-[12px]" style={{ color: C.textSecondary }}>{action.desc}</p>
+                  <div className="mt-4 flex items-center justify-end gap-1 text-[12px] font-semibold" style={{ color: C.blue }}>
+                    <span>View</span>
+                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                   </div>
                 </Link>
               )
