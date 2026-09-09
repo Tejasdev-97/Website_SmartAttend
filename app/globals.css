@@ -1,70 +1,154 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── SmartAttend Design Tokens ─────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
+  --color-background:           var(--background);
+  --color-foreground:           var(--foreground);
+  --color-card:                 var(--card);
+  --color-card-foreground:      var(--card-foreground);
+  --color-popover:              var(--popover);
+  --color-popover-foreground:   var(--popover-foreground);
+  --color-primary:              var(--primary);
+  --color-primary-foreground:   var(--primary-foreground);
+  --color-secondary:            var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-navy: #0B1F3A;
-  --color-blue-brand: #1565D8;
-  --color-blue-accent: #247BFF;
-  --color-blue-soft: #EAF3FF;
-  --color-ivory: #FAF7F0;
-  --color-cream: #FFF9EF;
-  --color-apricot: #FFF1E6;
-  --color-orange-accent: #E98A45;
-  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-  --shadow-card: 0 1px 4px rgb(11 31 58 / 0.06), 0 1px 2px rgb(11 31 58 / 0.04);
-  --shadow-elevated: 0 4px 16px rgb(11 31 58 / 0.10), 0 1px 4px rgb(11 31 58 / 0.06);
-  --shadow-modal: 0 20px 60px rgb(11 31 58 / 0.18), 0 4px 16px rgb(11 31 58 / 0.10);
+  --color-muted:                var(--muted);
+  --color-muted-foreground:     var(--muted-foreground);
+  --color-accent:               var(--accent);
+  --color-accent-foreground:    var(--accent-foreground);
+  --color-destructive:          var(--destructive);
+  --color-border:               var(--border);
+  --color-input:                var(--input);
+  --color-ring:                 var(--ring);
+
+  /* Brand */
+  --color-sa-navy:          #071B49;
+  --color-sa-dark-navy:     #09204F;
+  --color-sa-blue:          #0B5CFF;
+  --color-sa-blue-bright:   #1264F5;
+  --color-sa-blue-light:    #EAF3FF;
+  --color-sa-blue-faint:    #F5F9FF;
+  --color-sa-page-bg:       #F7FBFF;
+  --color-sa-purple:        #6C3FF5;
+  --color-sa-purple-light:  #F1ECFF;
+  --color-sa-green:         #16A34A;
+  --color-sa-green-light:   #E8F8EF;
+  --color-sa-orange:        #F59E0B;
+  --color-sa-orange-light:  #FFF4DE;
+  --color-sa-red:           #EF4444;
+  --color-sa-red-light:     #FDECEC;
+  --color-sa-border:        #D9E4F2;
+
+  /* Text */
+  --color-sa-text-primary:   #071B49;
+  --color-sa-text-secondary: #243B64;
+  --color-sa-text-tertiary:  #526887;
+
+  /* Font */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Shadows */
+  --shadow-card:    0 1px 3px rgba(7, 27, 73, 0.05), 0 1px 2px rgba(7, 27, 73, 0.04);
+  --shadow-panel:   0 2px 10px rgba(7, 27, 73, 0.07), 0 1px 3px rgba(7, 27, 73, 0.05);
+  --shadow-modal:   0 20px 60px rgba(7, 27, 73, 0.16), 0 4px 16px rgba(7, 27, 73, 0.10);
+  --shadow-nav:     0 1px 0 #D9E4F2;
 }
 
 :root {
   color-scheme: light;
-  --background: #F7F9FC;
-  --foreground: #172033;
-  --card: #ffffff;
-  --card-foreground: #172033;
-  --popover: #ffffff;
-  --popover-foreground: #172033;
-  --primary: #1565D8;
-  --primary-foreground: #ffffff;
-  --secondary: #EAF3FF;
-  --secondary-foreground: #0B1F3A;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
-  --accent: #EAF3FF;
-  --accent-foreground: #0B1F3A;
-  --destructive: #C24141;
-  --border: #D9E0E8;
-  --input: #D9E0E8;
-  --ring: #1565D8;
-  --radius: 0.5rem;
-  --success: #16845B;
-  --warning: #C87822;
+  /* Mapped to sa- tokens */
+  --background:            #F7FBFF;
+  --foreground:            #071B49;
+  --card:                  #ffffff;
+  --card-foreground:       #071B49;
+  --popover:               #ffffff;
+  --popover-foreground:    #071B49;
+  --primary:               #0B5CFF;
+  --primary-foreground:    #ffffff;
+  --secondary:             #EAF3FF;
+  --secondary-foreground:  #071B49;
+  --muted:                 #F5F9FF;
+  --muted-foreground:      #526887;
+  --accent:                #EAF3FF;
+  --accent-foreground:     #071B49;
+  --destructive:           #EF4444;
+  --border:                #D9E4F2;
+  --input:                 #D9E4F2;
+  --ring:                  #0B5CFF;
+  --radius:                0.5rem;
 }
 
-* { @apply border-border outline-ring/50; }
-html { background: var(--background); }
-body { @apply bg-background text-foreground font-sans antialiased; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; }
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { @apply border-border; }
+html { background: #F7FBFF; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  @apply bg-background text-foreground antialiased;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 button, a, input { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid #1565D8; outline-offset: 2px; }
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #0B5CFF;
+  outline-offset: 2px;
+}
+
+/* ── SmartAttend Utility Classes ───────────────────────────────────────────── */
+
+/* Input standard */
+.sa-input {
+  @apply h-11 w-full rounded-lg border border-[#D9E4F2] bg-white px-3 text-sm text-[#071B49];
+  @apply outline-none transition-all placeholder:text-[#8EA5C0];
+  @apply focus:border-[#0B5CFF] focus:ring-2 focus:ring-[#0B5CFF]/10;
+}
+
+/* Select standard */
+.sa-select {
+  @apply h-11 rounded-lg border border-[#D9E4F2] bg-white px-3 text-sm text-[#071B49];
+  @apply outline-none focus:border-[#0B5CFF] appearance-none;
+}
+
+/* Card standard */
+.sa-card {
+  background: #ffffff;
+  border: 1px solid #D9E4F2;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(7, 27, 73, 0.05);
+}
+
+/* Table header */
+.sa-th {
+  @apply px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#243B64] bg-[#F4F8FD];
+}
+
+/* Table cell */
+.sa-td {
+  @apply px-5 py-[14px] text-[13.5px] text-[#071B49];
+}
+
+/* Nav link active underline */
+.sa-nav-active-bar {
+  @apply absolute -bottom-px left-0 right-0 h-[2px] rounded-full bg-[#0B5CFF];
+}
+
+/* Info notice */
+.sa-notice {
+  @apply flex items-start gap-3 rounded-xl border border-blue-100 bg-[#EAF3FF] p-4 text-sm text-[#243B64];
+}
+
+/* Section label */
+.sa-label {
+  @apply block text-[13px] font-medium text-[#243B64];
+}

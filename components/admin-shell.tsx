@@ -6,171 +6,253 @@ import { useState } from 'react'
 import {
   BarChart3, Bell, BookOpen, CalendarDays, ChevronDown,
   ClipboardList, GraduationCap, LayoutDashboard, Menu,
-  Search, Settings, ShieldCheck, UserCog, Users, X,
+  RefreshCcw, Search, Settings, Shield, UserCog, Users, X,
 } from 'lucide-react'
 
-// ── Navigation items ──────────────────────────────────────────────────────────
+// ─── Design Tokens (mirrors globals.css) ──────────────────────────────────────
+export const C = {
+  navy:          '#071B49',
+  navyDark:      '#09204F',
+  blue:          '#0B5CFF',
+  blueBright:    '#1264F5',
+  blueLight:     '#EAF3FF',
+  blueFaint:     '#F5F9FF',
+  pageBg:        '#F7FBFF',
+  border:        '#D9E4F2',
+  textPrimary:   '#071B49',
+  textSecondary: '#243B64',
+  textTertiary:  '#526887',
+  green:         '#16A34A',
+  greenLight:    '#E8F8EF',
+  orange:        '#F59E0B',
+  orangeLight:   '#FFF4DE',
+  red:           '#EF4444',
+  redLight:      '#FDECEC',
+  purple:        '#6C3FF5',
+  purpleLight:   '#F1ECFF',
+  white:         '#FFFFFF',
+} as const
+
+// ─── Navigation definition ────────────────────────────────────────────────────
 const primaryNav = [
-  { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  { label: 'Students', href: '/admin/students', icon: GraduationCap },
-  { label: 'Faculty', href: '/admin/faculty', icon: Users },
-  { label: 'Academic Master', href: '/admin/academic-master', icon: BookOpen },
-  { label: 'Timetable', href: '/admin/timetable', icon: CalendarDays },
-  { label: 'Reports', href: '/admin/reports', icon: BarChart3 },
+  { label: 'Dashboard',         href: '/admin/dashboard',       icon: LayoutDashboard },
+  { label: 'Students',          href: '/admin/students',         icon: GraduationCap   },
+  { label: 'Faculty',           href: '/admin/faculty',          icon: Users            },
+  { label: 'Academic Master',   href: '/admin/academic-master',  icon: BookOpen         },
+  { label: 'Timetable',         href: '/admin/timetable',        icon: CalendarDays     },
+  { label: 'Reports & Analytics', href: '/admin/reports',        icon: BarChart3        },
 ]
 
 const moreNav = [
-  { label: 'Bulk Update', href: '/admin/bulk-update', icon: ClipboardList },
-  { label: 'Users & Roles', href: '/admin/users', icon: UserCog },
-  { label: 'Audit Logs', href: '/admin/audit-logs', icon: ClipboardList },
-  { label: 'Settings', href: '/admin/settings', icon: Settings },
-  { label: 'Timetable Import', href: '/admin/timetable/import', icon: CalendarDays },
-  { label: 'Timetable Publish', href: '/admin/timetable/publish', icon: CalendarDays },
+  { label: 'Bulk Update',        href: '/admin/bulk-update',          icon: RefreshCcw   },
+  { label: 'Users & Roles',      href: '/admin/users',                icon: UserCog      },
+  { label: 'Audit Logs',         href: '/admin/audit-logs',           icon: ClipboardList},
+  { label: 'Settings',           href: '/admin/settings',             icon: Settings     },
+  { label: 'Timetable Import',   href: '/admin/timetable/import',     icon: CalendarDays },
+  { label: 'Timetable Publish',  href: '/admin/timetable/publish',    icon: CalendarDays },
 ]
 
-// ── AdminShell ────────────────────────────────────────────────────────────────
+// ─── AdminShell ───────────────────────────────────────────────────────────────
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileOpen,  setMobileOpen]  = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const [moreOpen, setMoreOpen] = useState(false)
+  const [moreOpen,    setMoreOpen]    = useState(false)
 
-  const active = (href: string) =>
+  const isActive = (href: string) =>
     pathname === href || (href !== '/admin/dashboard' && pathname.startsWith(href))
 
+  const isMoreActive = moreNav.some(n => isActive(n.href))
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* ── Top Navigation ────────────────────────────────────────────────── */}
+    <div className="min-h-screen" style={{ background: C.pageBg }}>
+
+      {/* ── Top Navigation Bar ───────────────────────────────────────────── */}
       <header
-        className="sticky top-0 z-40 w-full border-b border-border bg-white"
-        style={{ boxShadow: '0 1px 0 #D9E0E8' }}
+        className="sticky top-0 z-40 w-full bg-white"
+        style={{ borderBottom: `1px solid ${C.border}`, boxShadow: '0 1px 0 #D9E4F2' }}
       >
-        <div className="mx-auto flex h-[68px] max-w-[1440px] items-center gap-6 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-5 px-5 lg:px-8">
+
           {/* Logo */}
-          <Link
-            href="/admin/dashboard"
-            className="flex shrink-0 items-center gap-2.5 mr-4"
-          >
-            <div className="flex size-9 items-center justify-center rounded-xl bg-[#1565D8] text-white shadow-sm">
-              <ShieldCheck className="size-5" />
+          <Link href="/admin/dashboard" className="flex shrink-0 items-center gap-2.5 mr-3">
+            <div
+              className="flex size-8 items-center justify-center rounded-lg"
+              style={{ background: C.blue }}
+            >
+              <Shield className="size-4 text-white" />
             </div>
-            <div className="hidden sm:block">
-              <p className="text-[15px] font-800 leading-tight tracking-tight text-[#0B1F3A]">
-                <span className="font-bold">Smart</span>
-                <span className="font-bold text-[#1565D8]">Attend</span>
+            <div>
+              <p className="text-[15px] font-bold leading-tight" style={{ color: C.navy }}>
+                Smart<span style={{ color: C.blue }}>Attend</span>
               </p>
-              <p className="text-[10px] font-600 tracking-[0.12em] text-[#64748B] uppercase">
-                Admin Console
+              <p className="hidden sm:block text-[10px] font-medium tracking-widest uppercase" style={{ color: C.textTertiary }}>
+                ABC Engineering College
               </p>
             </div>
           </Link>
 
           {/* Primary nav — desktop */}
-          <nav className="hidden xl:flex items-center gap-1 flex-1">
-            {primaryNav.map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13.5px] font-600 transition-colors ${
-                  active(item.href)
-                    ? 'bg-[#EAF3FF] text-[#1565D8]'
-                    : 'text-[#374151] hover:bg-slate-50 hover:text-[#0B1F3A]'
-                }`}
-              >
-                {item.label}
-                {active(item.href) && (
-                  <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-[#1565D8]" />
-                )}
-              </Link>
-            ))}
+          <nav className="hidden lg:flex items-center gap-0.5 flex-1">
+            {primaryNav.map(item => {
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors"
+                  style={{
+                    color:      active ? C.blue   : C.textSecondary,
+                    background: active ? C.blueLight : 'transparent',
+                    fontWeight: active ? 600 : 500,
+                  }}
+                  onMouseEnter={e => { if (!active) (e.currentTarget as HTMLAnchorElement).style.color = C.navy }}
+                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLAnchorElement).style.color = C.textSecondary }}
+                >
+                  {item.label}
+                  {active && (
+                    <span
+                      className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full"
+                      style={{ background: C.blue }}
+                    />
+                  )}
+                </Link>
+              )
+            })}
 
             {/* More dropdown */}
             <div className="relative">
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className={`flex items-center gap-1 rounded-lg px-3 py-2 text-[13.5px] font-600 transition-colors ${
-                  moreNav.some(n => active(n.href))
-                    ? 'bg-[#EAF3FF] text-[#1565D8]'
-                    : 'text-[#374151] hover:bg-slate-50 hover:text-[#0B1F3A]'
-                }`}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-[13.5px] transition-colors"
+                style={{
+                  color:      isMoreActive ? C.blue      : C.textSecondary,
+                  background: isMoreActive ? C.blueLight : 'transparent',
+                  fontWeight: isMoreActive ? 600 : 500,
+                }}
               >
                 More
-                <ChevronDown className="size-3.5" />
+                <ChevronDown
+                  className="size-3.5 transition-transform"
+                  style={{ transform: moreOpen ? 'rotate(180deg)' : 'none' }}
+                />
+                {isMoreActive && (
+                  <span
+                    className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full"
+                    style={{ background: C.blue }}
+                  />
+                )}
               </button>
               {moreOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
-                  <div className="absolute left-0 top-full mt-2 z-20 w-52 rounded-xl border border-border bg-white p-1.5 shadow-elevated">
-                    {moreNav.map(item => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setMoreOpen(false)}
-                        className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-500 transition-colors ${
-                          active(item.href)
-                            ? 'bg-[#EAF3FF] text-[#1565D8]'
-                            : 'text-[#374151] hover:bg-slate-50'
-                        }`}
-                      >
-                        <item.icon className="size-4 text-[#64748B]" />
-                        {item.label}
-                      </Link>
-                    ))}
+                  <div
+                    className="absolute left-0 top-full mt-2 z-20 w-56 rounded-xl p-1.5"
+                    style={{
+                      background: C.white,
+                      border: `1px solid ${C.border}`,
+                      boxShadow: '0 8px 32px rgba(7,27,73,0.12)',
+                    }}
+                  >
+                    {moreNav.map(item => {
+                      const active = isActive(item.href)
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setMoreOpen(false)}
+                          className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors"
+                          style={{
+                            color:      active ? C.blue      : C.textSecondary,
+                            background: active ? C.blueLight : 'transparent',
+                            fontWeight: active ? 600 : 400,
+                          }}
+                        >
+                          <item.icon className="size-[15px]" style={{ color: active ? C.blue : C.textTertiary }} />
+                          {item.label}
+                        </Link>
+                      )
+                    })}
                   </div>
                 </>
               )}
             </div>
           </nav>
 
-          {/* Right actions */}
-          <div className="ml-auto flex items-center gap-1.5">
-            {/* Search — desktop */}
-            <div className="hidden md:flex items-center gap-2 h-9 rounded-lg border border-border bg-slate-50 px-3 w-48 lg:w-56">
-              <Search className="size-3.5 text-[#64748B] shrink-0" />
+          {/* Right section */}
+          <div className="ml-auto flex items-center gap-2">
+            {/* Search */}
+            <div
+              className="hidden md:flex items-center gap-2 h-9 rounded-lg px-3 w-44 lg:w-52"
+              style={{ border: `1px solid ${C.border}`, background: C.blueFaint }}
+            >
+              <Search className="size-3.5 shrink-0" style={{ color: C.textTertiary }} />
               <input
                 aria-label="Search"
-                placeholder="Search anything..."
-                className="w-full bg-transparent text-xs text-[#374151] outline-none placeholder:text-[#9CA3AF]"
+                placeholder="Search..."
+                className="w-full bg-transparent text-[13px] outline-none"
+                style={{ color: C.textPrimary }}
               />
             </div>
 
             {/* Notifications */}
             <button
               aria-label="Notifications"
-              className="relative flex size-9 items-center justify-center rounded-lg text-[#64748B] hover:bg-slate-50 hover:text-[#374151] transition-colors"
+              className="relative flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-[#EAF3FF]"
+              style={{ color: C.textTertiary }}
             >
               <Bell className="size-[18px]" />
-              <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-[#C24141] ring-2 ring-white" />
+              <span
+                className="absolute right-1.5 top-1.5 size-2 rounded-full ring-2 ring-white"
+                style={{ background: C.red }}
+              />
             </button>
 
             {/* Profile */}
             <div className="relative">
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-[#F5F9FF]"
               >
-                <div className="flex size-8 items-center justify-center rounded-full bg-[#EAF3FF] text-xs font-700 text-[#1565D8]">
+                <div
+                  className="flex size-8 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ background: C.blue }}
+                >
                   AK
                 </div>
                 <div className="hidden sm:block text-left">
-                  <p className="text-[12.5px] font-600 text-[#0B1F3A] leading-tight">Anita Kulkarni</p>
-                  <p className="text-[11px] text-[#64748B]">Super Admin</p>
+                  <p className="text-[12.5px] font-semibold leading-tight" style={{ color: C.navy }}>
+                    Anita Kulkarni
+                  </p>
+                  <p className="text-[11px]" style={{ color: C.textTertiary }}>Super Admin</p>
                 </div>
-                <ChevronDown className="hidden sm:block size-3.5 text-[#64748B]" />
+                <ChevronDown className="hidden sm:block size-3.5" style={{ color: C.textTertiary }} />
               </button>
+
               {profileOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setProfileOpen(false)} />
-                  <div className="absolute right-0 top-full mt-2 z-20 w-44 rounded-xl border border-border bg-white p-1.5 shadow-elevated">
+                  <div
+                    className="absolute right-0 top-full mt-2 z-20 w-44 rounded-xl p-1.5"
+                    style={{
+                      background: C.white,
+                      border: `1px solid ${C.border}`,
+                      boxShadow: '0 8px 32px rgba(7,27,73,0.12)',
+                    }}
+                  >
                     <Link
                       href="/admin/settings"
                       onClick={() => setProfileOpen(false)}
-                      className="block rounded-lg px-3 py-2.5 text-sm text-[#374151] hover:bg-slate-50"
+                      className="block rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-[#F5F9FF]"
+                      style={{ color: C.textSecondary }}
                     >
                       View Profile
                     </Link>
-                    <div className="my-1 h-px bg-border" />
-                    <button className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-[#C24141] hover:bg-red-50">
+                    <div className="my-1 h-px" style={{ background: C.border }} />
+                    <button
+                      className="w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-red-50"
+                      style={{ color: C.red }}
+                    >
                       Sign Out
                     </button>
                   </div>
@@ -178,11 +260,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               )}
             </div>
 
-            {/* Mobile menu toggle */}
+            {/* Mobile toggle */}
             <button
               aria-label="Open navigation"
               onClick={() => setMobileOpen(true)}
-              className="flex xl:hidden size-9 items-center justify-center rounded-lg text-[#64748B] hover:bg-slate-50"
+              className="flex lg:hidden size-9 items-center justify-center rounded-lg transition-colors hover:bg-[#EAF3FF]"
+              style={{ color: C.textTertiary }}
             >
               <Menu className="size-5" />
             </button>
@@ -190,95 +273,113 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* ── Mobile Menu ────────────────────────────────────────────────────── */}
+      {/* ── Mobile Menu ──────────────────────────────────────────────────────── */}
       {mobileOpen && (
         <>
           <div
-            className="fixed inset-0 z-50 bg-[#0B1F3A]/40"
+            className="fixed inset-0 z-50"
+            style={{ background: 'rgba(7,27,73,0.35)' }}
             onClick={() => setMobileOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 z-50 w-72 bg-white shadow-modal overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <div
+            className="fixed inset-y-0 right-0 z-50 w-72 overflow-y-auto"
+            style={{ background: C.white }}
+          >
+            <div
+              className="flex items-center justify-between px-5 py-4"
+              style={{ borderBottom: `1px solid ${C.border}` }}
+            >
               <div className="flex items-center gap-2.5">
-                <div className="flex size-8 items-center justify-center rounded-lg bg-[#1565D8] text-white">
-                  <ShieldCheck className="size-4" />
+                <div className="flex size-8 items-center justify-center rounded-lg" style={{ background: C.blue }}>
+                  <Shield className="size-4 text-white" />
                 </div>
-                <p className="font-700 text-[#0B1F3A]">
-                  <span>Smart</span>
-                  <span className="text-[#1565D8]">Attend</span>
+                <p className="font-bold" style={{ color: C.navy }}>
+                  Smart<span style={{ color: C.blue }}>Attend</span>
                 </p>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
                 aria-label="Close navigation"
-                className="rounded-lg p-2 text-[#64748B] hover:bg-slate-50"
+                className="rounded-lg p-2 transition-colors hover:bg-[#F5F9FF]"
+                style={{ color: C.textTertiary }}
               >
                 <X className="size-5" />
               </button>
             </div>
             <nav className="p-3 space-y-0.5">
-              {[...primaryNav, ...moreNav].map(item => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-500 transition-colors ${
-                    active(item.href)
-                      ? 'bg-[#EAF3FF] text-[#1565D8] font-600'
-                      : 'text-[#374151] hover:bg-slate-50'
-                  }`}
-                >
-                  <item.icon className="size-4 shrink-0" />
-                  {item.label}
-                </Link>
-              ))}
+              {[...primaryNav, ...moreNav].map(item => {
+                const active = isActive(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors"
+                    style={{
+                      color:      active ? C.blue      : C.textSecondary,
+                      background: active ? C.blueLight : 'transparent',
+                      fontWeight: active ? 600 : 400,
+                    }}
+                  >
+                    <item.icon className="size-4 shrink-0" />
+                    {item.label}
+                  </Link>
+                )
+              })}
             </nav>
           </div>
         </>
       )}
 
-      {/* ── Page Content ───────────────────────────────────────────────────── */}
+      {/* ── Page ─────────────────────────────────────────────────────────────── */}
       <main>{children}</main>
     </div>
   )
 }
 
-// ── Shared layout helpers ─────────────────────────────────────────────────────
+// ─── Shared layout components ─────────────────────────────────────────────────
+
 export function AdminContent({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-6 lg:px-8">
       {children}
     </div>
   )
 }
 
 export function PageHeader({
-  eyebrow,
   title,
   description,
   actions,
+  eyebrow,
 }: {
-  eyebrow?: string
   title: string
   description?: string
   actions?: React.ReactNode
+  eyebrow?: string
 }) {
   return (
-    <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+    <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
       <div>
         {eyebrow && (
-          <p className="mb-1.5 text-xs font-700 uppercase tracking-[0.12em] text-[#1565D8]">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest" style={{ color: C.blue }}>
             {eyebrow}
           </p>
         )}
-        <h1 className="text-[28px] font-800 tracking-tight text-[#0B1F3A] leading-tight">
+        <h1 className="text-[26px] font-bold leading-tight" style={{ color: C.navy }}>
           {title}
         </h1>
         {description && (
-          <p className="mt-1.5 text-sm text-[#4B5563]">{description}</p>
+          <p className="mt-1.5 text-[14px]" style={{ color: C.textSecondary }}>
+            {description}
+          </p>
         )}
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      {actions && (
+        <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
+          {actions}
+        </div>
+      )}
     </div>
   )
 }
@@ -288,21 +389,27 @@ export function Panel({
   description,
   children,
   className = '',
+  noPad = false,
 }: {
   title?: string
   description?: string
   children: React.ReactNode
   className?: string
+  noPad?: boolean
 }) {
   return (
     <section
-      className={`rounded-xl border border-border bg-white shadow-card ${className}`}
+      className={`rounded-xl bg-white ${className}`}
+      style={{ border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(7,27,73,0.05)' }}
     >
       {title && (
-        <div className="border-b border-border px-5 py-4">
-          <h2 className="text-base font-700 text-[#0B1F3A]">{title}</h2>
+        <div
+          className="px-5 py-4"
+          style={{ borderBottom: `1px solid ${C.border}` }}
+        >
+          <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>{title}</h2>
           {description && (
-            <p className="mt-0.5 text-xs text-[#64748B]">{description}</p>
+            <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>{description}</p>
           )}
         </div>
       )}
@@ -316,26 +423,33 @@ export function StatusBadge({
   tone = 'green',
 }: {
   children: React.ReactNode
-  tone?: 'green' | 'red' | 'blue' | 'orange' | 'navy'
+  tone?: 'green' | 'red' | 'blue' | 'orange' | 'navy' | 'purple'
 }) {
-  const colors = {
-    green:  'bg-emerald-50 text-emerald-700 border-emerald-100',
-    red:    'bg-red-50 text-red-700 border-red-100',
-    blue:   'bg-[#EAF3FF] text-[#1565D8] border-blue-100',
-    orange: 'bg-orange-50 text-orange-700 border-orange-100',
-    navy:   'bg-[#F1F5F9] text-[#374151] border-[#D9E0E8]',
+  const styles: Record<string, { bg: string; text: string; border: string }> = {
+    green:  { bg: '#E8F8EF', text: '#14532D', border: '#BBF7D0' },
+    red:    { bg: '#FDECEC', text: '#991B1B', border: '#FECACA' },
+    blue:   { bg: '#EAF3FF', text: '#1E40AF', border: '#BFDBFE' },
+    orange: { bg: '#FFF4DE', text: '#92400E', border: '#FED7AA' },
+    navy:   { bg: '#F5F9FF', text: '#243B64', border: '#D9E4F2' },
+    purple: { bg: '#F1ECFF', text: '#4C1D95', border: '#DDD6FE' },
   }
+  const s = styles[tone]
   return (
     <span
-      className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-700 uppercase tracking-wide ${colors[tone]}`}
+      className="inline-flex items-center rounded-full px-2.5 py-[3px] text-[11.5px] font-semibold"
+      style={{ background: s.bg, color: s.text, border: `1px solid ${s.border}` }}
     >
       {children}
     </span>
   )
 }
 
-// ── Button style exports ──────────────────────────────────────────────────────
-export const buttonClass =
-  'inline-flex h-[42px] items-center justify-center gap-2 rounded-lg px-4 text-[13.5px] font-600 transition-all duration-150'
-export const primaryButton = `${buttonClass} bg-[#1565D8] text-white shadow-sm hover:bg-[#1250B0] active:scale-[0.98]`
-export const secondaryButton = `${buttonClass} border border-border bg-white text-[#374151] hover:bg-slate-50 hover:border-[#9CA3AF] active:scale-[0.98]`
+// ─── Button exports ───────────────────────────────────────────────────────────
+export const primaryButton =
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#0B5CFF] px-4 text-[13.5px] font-semibold text-white transition-all hover:bg-[#0A50E0] active:scale-[0.98] shadow-sm'
+
+export const secondaryButton =
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#D9E4F2] bg-white px-4 text-[13.5px] font-medium text-[#243B64] transition-all hover:border-[#0B5CFF] hover:text-[#0B5CFF] hover:bg-[#F5F9FF] active:scale-[0.98]'
+
+export const dangerButton =
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#EF4444] px-4 text-[13.5px] font-semibold text-white transition-all hover:bg-[#DC2626] active:scale-[0.98]'

@@ -3,25 +3,29 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import {
-  AlertCircle, AlertTriangle, ArrowLeft, BarChart3, Bell, BookOpen,
-  Check, CheckCircle2, ChevronDown, ClipboardList, Clock, Download,
-  FileSpreadsheet, FileText, GraduationCap, Info, LockKeyhole, Mail,
-  Plus, Save, Search, Settings, Shield, ShieldCheck, SlidersHorizontal,
-  Trash2, Upload, UserCog, UserRound, Users, X, Monitor,
+  ArrowLeft, BarChart3, Bell, BookOpen, Check, CheckCircle2,
+  ClipboardList, Download, Edit3, FileText, GraduationCap,
+  Info, LockKeyhole, Monitor, Plus, RefreshCcw, Save,
+  Search, Shield, SlidersHorizontal, Trash2, TrendingUp, Users, X,
 } from 'lucide-react'
 import {
-  AdminContent, AdminShell, PageHeader, Panel,
+  AdminContent, AdminShell, C, PageHeader, Panel,
   primaryButton, secondaryButton, StatusBadge,
 } from './admin-shell'
 
-// ── Shared helpers ────────────────────────────────────────────────────────────
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+// ─── Shared helpers ───────────────────────────────────────────────────────────
+function Modal({ title, subtitle, children, onClose }: {
+  title: string; subtitle?: string; children: React.ReactNode; onClose: () => void
+}) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1F3A]/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl border border-[#D9E0E8] bg-white shadow-[0_20px_60px_rgb(11_31_58/0.18)]">
-        <div className="flex items-center justify-between border-b border-[#D9E0E8] px-5 py-4">
-          <h2 className="font-700 text-[#0B1F3A]">{title}</h2>
-          <button aria-label="Close" onClick={onClose} className="rounded-lg p-2 text-[#64748B] hover:bg-slate-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(7,27,73,0.30)' }}>
+      <div className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-white" style={{ border: `1px solid ${C.border}`, boxShadow: '0 20px 60px rgba(7,27,73,0.16)' }}>
+        <div className="flex items-start justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+          <div>
+            <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>{title}</h2>
+            {subtitle && <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>{subtitle}</p>}
+          </div>
+          <button aria-label="Close" onClick={onClose} className="ml-4 rounded-lg p-1.5 hover:bg-[#F5F9FF]" style={{ color: C.textTertiary }}>
             <X className="size-4" />
           </button>
         </div>
@@ -33,146 +37,172 @@ function Modal({ title, children, onClose }: { title: string; children: React.Re
 
 function Toast({ message }: { message: string }) {
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl bg-[#0B1F3A] px-5 py-3.5 text-sm font-600 text-white shadow-[0_20px_60px_rgb(11_31_58/0.18)]">
-      <CheckCircle2 className="size-4 text-emerald-400" />
+    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl px-5 py-3.5 text-[13.5px] font-semibold shadow-[0_20px_60px_rgba(7,27,73,0.18)]" style={{ background: C.green, color: C.white }}>
+      <CheckCircle2 className="size-4" />
       {message}
     </div>
   )
 }
 
-function Notice({ children, tone = 'blue' }: { children: React.ReactNode; tone?: 'blue' | 'orange' | 'green' }) {
-  const styles = {
-    blue:   'border-blue-100 bg-[#EAF3FF] text-[#1565D8]',
-    orange: 'border-orange-100 bg-orange-50 text-orange-800',
-    green:  'border-emerald-100 bg-emerald-50 text-emerald-800',
-  }
+function Inp({ label, type = 'text', placeholder, required }: {
+  label: string; type?: string; placeholder?: string; required?: boolean
+}) {
   return (
-    <div className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${styles[tone]}`}>
-      <Info className="mt-0.5 size-4 shrink-0" />
-      <div>{children}</div>
-    </div>
+    <label className="block">
+      <span className="block text-[13px] font-medium mb-1.5" style={{ color: C.textSecondary }}>
+        {label}{required && <span className="ml-0.5" style={{ color: C.red }}>*</span>}
+      </span>
+      <input type={type} placeholder={placeholder}
+        className="h-10 w-full rounded-lg border bg-white px-3 text-[13.5px] outline-none transition-all"
+        style={{ borderColor: C.border, color: C.textPrimary }}
+        onFocus={e => { e.currentTarget.style.borderColor = C.blue }}
+        onBlur={e =>  { e.currentTarget.style.borderColor = C.border }}
+      />
+    </label>
   )
 }
 
-// ── Users & Roles ─────────────────────────────────────────────────────────────
+// ─── System Users & Roles ─────────────────────────────────────────────────────
 const roles = [
-  { id: 1, title: 'Super Admin', count: 2, perms: ['Full system access', 'User management', 'Academic master', 'Audit logs', 'Settings'], color: 'bg-[#EAF3FF] text-[#1565D8]' },
-  { id: 2, title: 'Admin', count: 8, perms: ['Student management', 'Faculty management', 'Timetable management', 'Reports'], color: 'bg-violet-50 text-violet-700' },
-  { id: 3, title: 'Faculty', count: 156, perms: ['View own timetable', 'Mark attendance', 'View reports'], color: 'bg-emerald-50 text-emerald-700' },
-  { id: 4, title: 'Student', count: 2856, perms: ['View own timetable', 'View own attendance'], color: 'bg-orange-50 text-orange-700' },
+  { title: 'Super Admin', count: 2,    color: C.blue,   bg: C.blueLight,   perms: ['Full system access','User management','Audit logs','Settings'] },
+  { title: 'Admin',       count: 8,    color: C.purple, bg: C.purpleLight, perms: ['Student management','Faculty management','Timetable','Reports'] },
+  { title: 'Faculty',     count: 156,  color: C.green,  bg: C.greenLight,  perms: ['View own timetable','Mark attendance','View reports'] },
+  { title: 'Student',     count: 2856, color: C.orange, bg: C.orangeLight, perms: ['View own timetable','View own attendance'] },
 ]
 
 const users = [
-  ['Anita Kulkarni', 'anita@college.edu.in', 'Super Admin', 'Active'],
-  ['Suresh Rao', 'suresh@college.edu.in', 'Admin', 'Active'],
-  ['Preeti Sharma', 'preeti@college.edu.in', 'Admin', 'Active'],
-  ['Rohit Sharma', 'rohit@college.edu.in', 'Faculty', 'Active'],
-  ['Neha Joshi', 'neha@college.edu.in', 'Faculty', 'Inactive'],
+  { name: 'Anita Kulkarni', email: 'anita@college.edu.in',  role: 'Super Admin', dept: 'Administration', status: 'Active'   },
+  { name: 'Suresh Rao',     email: 'suresh@college.edu.in', role: 'Admin',       dept: 'Administration', status: 'Active'   },
+  { name: 'Preeti Sharma',  email: 'preeti@college.edu.in', role: 'Admin',       dept: 'Administration', status: 'Active'   },
+  { name: 'Rohit Sharma',   email: 'rohit@college.edu.in',  role: 'Faculty',     dept: 'CSE',            status: 'Active'   },
+  { name: 'Neha Joshi',     email: 'neha@college.edu.in',   role: 'Faculty',     dept: 'CSE',            status: 'Inactive' },
 ]
+
+const roleTone: Record<string, 'blue' | 'purple' | 'green' | 'orange'> = {
+  'Super Admin': 'blue', 'Admin': 'purple', 'Faculty': 'green', 'Student': 'orange'
+}
 
 export function UsersRolesPage() {
   const [modal, setModal] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const [toast, setToast] = useState(false)
   const [query, setQuery] = useState('')
-  const filtered = users.filter(u => u[0].toLowerCase().includes(query.toLowerCase()) || u[1].toLowerCase().includes(query.toLowerCase()))
+  const filtered = users.filter(u =>
+    (u.name + u.email).toLowerCase().includes(query.toLowerCase())
+  )
 
   return (
     <AdminShell>
       <AdminContent>
         <PageHeader
-          title="Users & Roles"
-          description="Manage system users, role assignments and access permissions."
+          title="System Users & Roles"
+          description="Manage admin users, assign roles and control access permissions."
           actions={
             <button onClick={() => setModal(true)} className={primaryButton}>
-              <Plus className="size-4" /> Create User
+              <Plus className="size-4" /> Add User
             </button>
           }
         />
 
-        {/* Role cards */}
-        <h2 className="mb-4 text-[15px] font-700 text-[#0B1F3A]">Roles Overview</h2>
+        {/* Role overview */}
+        <h2 className="mb-4 text-[14px] font-semibold" style={{ color: C.navy }}>Roles Overview</h2>
         <div className="mb-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {roles.map(role => (
-            <Panel key={role.id} className="p-5">
-              <div className="flex items-start justify-between">
-                <div className={`rounded-lg px-3 py-1.5 text-xs font-700 uppercase tracking-wide ${role.color}`}>
+            <Panel key={role.title} className="p-5">
+              <div className="flex items-start justify-between mb-3">
+                <span
+                  className="rounded-lg px-2.5 py-1 text-[12px] font-semibold"
+                  style={{ background: role.bg, color: role.color }}
+                >
                   {role.title}
-                </div>
-                <span className="text-[26px] font-800 text-[#0B1F3A] leading-none">
+                </span>
+                <span className="text-[28px] font-bold leading-none" style={{ color: C.navy }}>
                   {role.count.toLocaleString()}
                 </span>
               </div>
-              <ul className="mt-4 space-y-1.5">
+              <div className="space-y-1.5">
                 {role.perms.map(p => (
-                  <li key={p} className="flex items-center gap-2 text-[12.5px] text-[#374151]">
-                    <Check className="size-3.5 text-emerald-600 shrink-0" />
+                  <div key={p} className="flex items-center gap-2 text-[12.5px]" style={{ color: C.textSecondary }}>
+                    <Check className="size-3.5 shrink-0" style={{ color: C.green }} />
                     {p}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </Panel>
           ))}
         </div>
 
-        {/* Users table */}
-        <div className="mb-5 flex flex-wrap gap-3">
-          <div className="relative min-w-[240px] flex-1">
-            <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#9CA3AF]" />
+        {/* Filters */}
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl p-4" style={{ background: C.white, border: `1px solid ${C.border}` }}>
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2" style={{ color: C.textTertiary }} />
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search by name or email"
-              className="h-11 w-full rounded-lg border border-[#D9E0E8] bg-white pl-10 pr-4 text-sm text-[#172033] outline-none placeholder:text-[#9CA3AF] focus:border-[#1565D8]"
+              className="h-10 w-full rounded-lg border pl-10 pr-4 text-[13.5px] outline-none"
+              style={{ borderColor: C.border, color: C.textPrimary }}
+              onFocus={e => { e.currentTarget.style.borderColor = C.blue }}
+              onBlur={e =>  { e.currentTarget.style.borderColor = C.border }}
             />
           </div>
-          <select className="h-11 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#374151] outline-none">
-            <option>All Roles</option>
-            {roles.map(r => <option key={r.id}>{r.title}</option>)}
+          <select className="h-10 rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }}>
+            <option value="">All Roles</option>
+            {roles.map(r => <option key={r.title}>{r.title}</option>)}
           </select>
-          <select className="h-11 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#374151] outline-none">
-            <option>All Status</option>
+          <select className="h-10 rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }}>
+            <option value="">All Status</option>
             <option>Active</option>
             <option>Inactive</option>
           </select>
+          <button onClick={() => setQuery('')} className={secondaryButton}>Reset</button>
         </div>
 
         <Panel>
-          <div className="px-5 py-4">
-            <h2 className="text-base font-700 text-[#0B1F3A]">System Users</h2>
+          <div className="px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+            <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>System Users</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] text-left text-sm">
-              <thead className="border-y border-[#D9E0E8] bg-[#F7F9FC] text-[11px] font-700 uppercase tracking-wider text-[#64748B]">
+            <table className="w-full min-w-[800px] text-left">
+              <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
                 <tr>
-                  {['User', 'Email', 'Role', 'Status', 'Actions'].map(h => (
-                    <th key={h} className={`px-5 py-3 ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>
+                  {['#','Name','Email','Role','Department','Status','Actions'].map((h, i) => (
+                    <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.textSecondary, textAlign: i === 6 ? 'right' : 'left' }}>
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9]">
-                {filtered.map(u => (
-                  <tr key={u[1]} className="hover:bg-[#F7F9FC] transition-colors">
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex size-9 items-center justify-center rounded-full bg-[#EAF3FF] text-xs font-700 text-[#1565D8]">
-                          {u[0].split(' ').map(x => x[0]).join('')}
+              <tbody>
+                {filtered.map((u, i) => (
+                  <tr key={u.email} style={{ borderBottom: `1px solid ${C.border}` }}
+                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
+                    onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                  >
+                    <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                    <td className="px-5 py-[14px]">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white" style={{ background: C.blue }}>
+                          {u.name.split(' ').map(x => x[0]).join('').slice(0,2)}
                         </div>
-                        <p className="font-600 text-[#0B1F3A]">{u[0]}</p>
+                        <span className="text-[13.5px] font-medium" style={{ color: C.navy }}>{u.name}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-[13px] text-[#374151]">{u[1]}</td>
-                    <td className="px-5 py-4">
-                      <StatusBadge tone={u[2] === 'Super Admin' ? 'blue' : u[2] === 'Admin' ? 'navy' : u[2] === 'Faculty' ? 'green' : 'orange'}>
-                        {u[2]}
-                      </StatusBadge>
+                    <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{u.email}</td>
+                    <td className="px-5 py-[14px]">
+                      <StatusBadge tone={roleTone[u.role] ?? 'navy'}>{u.role}</StatusBadge>
                     </td>
-                    <td className="px-5 py-4">
-                      <StatusBadge tone={u[3] === 'Active' ? 'green' : 'red'}>{u[3]}</StatusBadge>
+                    <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{u.dept}</td>
+                    <td className="px-5 py-[14px]">
+                      <StatusBadge tone={u.status === 'Active' ? 'green' : 'red'}>{u.status}</StatusBadge>
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-5 py-[14px] text-right">
                       <div className="flex justify-end gap-2">
-                        <button onClick={() => setModal(true)} className={`${secondaryButton} h-8 px-3 text-xs`}>Edit</button>
-                        <button className="h-8 rounded-lg border border-red-100 bg-red-50 px-3 text-xs font-600 text-red-600 hover:bg-red-100 transition-colors">Delete</button>
+                        <button onClick={() => setModal(true)} className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-[#EAF3FF]" style={{ borderColor: C.border, color: C.blue }}>
+                          <Edit3 className="size-3.5" /> Edit
+                        </button>
+                        <button className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-red-50" style={{ borderColor: '#FECACA', color: C.red }}>
+                          <Trash2 className="size-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -181,61 +211,58 @@ export function UsersRolesPage() {
             </table>
           </div>
         </Panel>
-
-        <div className="mt-5">
-          <Notice>Changes to roles and permissions are logged in the Audit Log for compliance.</Notice>
-        </div>
       </AdminContent>
 
       {modal && (
         <Modal title="Create System User" onClose={() => setModal(false)}>
           <div className="space-y-4">
-            {[['Full Name', 'text'], ['Email', 'email'], ['Mobile', 'text'], ['Temporary Password', 'password']].map(([label, type]) => (
-              <label key={label} className="block">
-                <span className="text-[13px] font-600 text-[#374151]">{label}</span>
-                <input type={type} className="mt-1.5 h-11 w-full rounded-lg border border-[#D9E0E8] px-3 text-sm text-[#172033] outline-none focus:border-[#1565D8]" />
-              </label>
-            ))}
+            <Inp label="Full Name"           required placeholder="e.g. Dr. Rajesh Kumar" />
+            <Inp label="Email"       type="email" required placeholder="user@college.edu.in" />
+            <Inp label="Mobile"              placeholder="+91 98765 43210" />
+            <Inp label="Temporary Password" type="password" required />
             <label className="block">
-              <span className="text-[13px] font-600 text-[#374151]">Role</span>
-              <select className="mt-1.5 h-11 w-full rounded-lg border border-[#D9E0E8] px-3 text-sm text-[#172033] outline-none focus:border-[#1565D8]">
-                {roles.map(r => <option key={r.id}>{r.title}</option>)}
+              <span className="block text-[13px] font-medium mb-1.5" style={{ color: C.textSecondary }}>
+                Role<span style={{ color: C.red }}>*</span>
+              </span>
+              <select className="h-10 w-full rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }}>
+                {roles.map(r => <option key={r.title}>{r.title}</option>)}
               </select>
             </label>
             <div className="flex justify-end gap-2 pt-2">
               <button onClick={() => setModal(false)} className={secondaryButton}>Cancel</button>
-              <button onClick={() => { setModal(false); setSaved(true) }} className={primaryButton}>Create User</button>
+              <button onClick={() => { setModal(false); setToast(true) }} className={primaryButton}>Create User</button>
             </div>
           </div>
         </Modal>
       )}
-      {saved && <Toast message="User created successfully." />}
+      {toast && <Toast message="User created successfully." />}
     </AdminShell>
   )
 }
 
-// ── Audit Logs ────────────────────────────────────────────────────────────────
-const auditEntries = [
-  { actor: 'Anita Kulkarni', role: 'Super Admin', action: 'Timetable Published', target: 'CSE Sem 5 · CSE 3A', time: '20 May 2024, 10:30 AM', type: 'publish' },
-  { actor: 'Suresh Rao', role: 'Admin', action: 'Student Account Created', target: '01CS128 · Sakshi Gupta', time: '19 May 2024, 03:15 PM', type: 'create' },
-  { actor: 'Anita Kulkarni', role: 'Super Admin', action: 'Role Changed', target: 'Preeti Sharma → Admin', time: '18 May 2024, 11:00 AM', type: 'update' },
-  { actor: 'Preeti Sharma', role: 'Admin', action: 'Student Device Replaced', target: '01CS123 · Rahul Sharma', time: '17 May 2024, 02:45 PM', type: 'update' },
-  { actor: 'Suresh Rao', role: 'Admin', action: 'Timetable Imported (Draft)', target: 'CSE Sem 6 Timetable', time: '16 May 2024, 09:00 AM', type: 'import' },
-  { actor: 'Anita Kulkarni', role: 'Super Admin', action: 'User Deleted', target: 'Rahul Mehta · Admin', time: '15 May 2024, 05:30 PM', type: 'delete' },
+// ─── Audit Logs ───────────────────────────────────────────────────────────────
+const auditLogs = [
+  { dt: '20 May 2024 · 10:30 AM', user: 'Anita Kulkarni', action: 'Timetable Published',       module: 'Timetable', details: 'CSE Sem 5 · CSE 3A',     ip: '192.168.1.10' },
+  { dt: '19 May 2024 · 03:15 PM', user: 'Suresh Rao',     action: 'Student Account Created',   module: 'Students',  details: '01CS128 · Sakshi Gupta', ip: '192.168.1.22' },
+  { dt: '18 May 2024 · 11:00 AM', user: 'Anita Kulkarni', action: 'Role Changed',              module: 'Users',     details: 'Preeti Sharma → Admin',   ip: '192.168.1.10' },
+  { dt: '17 May 2024 · 02:45 PM', user: 'Preeti Sharma',  action: 'Device Replaced',           module: 'Students',  details: '01CS123 · Rahul Sharma',  ip: '192.168.1.31' },
+  { dt: '16 May 2024 · 09:00 AM', user: 'Suresh Rao',     action: 'Timetable Imported (Draft)',module: 'Timetable', details: 'CSE Sem 6 file',           ip: '192.168.1.22' },
+  { dt: '15 May 2024 · 05:30 PM', user: 'Anita Kulkarni', action: 'User Deleted',              module: 'Users',     details: 'Rahul Mehta · Admin',     ip: '192.168.1.10' },
+  { dt: '14 May 2024 · 08:15 AM', user: 'Suresh Rao',     action: 'Bulk Academic Update',      module: 'Students',  details: '68 students · CSE 2nd Yr', ip: '192.168.1.22' },
+  { dt: '13 May 2024 · 10:00 AM', user: 'Anita Kulkarni', action: 'Login Failed',              module: 'Auth',      details: 'Failed attempt #1',       ip: '203.0.113.45' },
 ]
 
-const typeStyle: Record<string, string> = {
-  publish: 'bg-[#EAF3FF] text-[#1565D8]',
-  create:  'bg-emerald-50 text-emerald-700',
-  update:  'bg-orange-50 text-orange-700',
-  import:  'bg-violet-50 text-violet-700',
-  delete:  'bg-red-50 text-red-700',
+const actionTone: Record<string, 'blue' | 'green' | 'orange' | 'red' | 'purple'> = {
+  'Timetable':  'blue',
+  'Students':   'green',
+  'Users':      'orange',
+  'Auth':       'red',
 }
 
 export function AuditLogsPage() {
   const [query, setQuery] = useState('')
-  const filtered = auditEntries.filter(e =>
-    [e.actor, e.action, e.target].join(' ').toLowerCase().includes(query.toLowerCase()),
+  const filtered = auditLogs.filter(e =>
+    [e.action, e.user, e.module, e.details].join(' ').toLowerCase().includes(query.toLowerCase())
   )
 
   return (
@@ -243,7 +270,7 @@ export function AuditLogsPage() {
       <AdminContent>
         <PageHeader
           title="Audit Logs"
-          description="System-wide activity history for compliance and security reviews."
+          description="Track all important activities performed in the system."
           actions={
             <button className={secondaryButton}>
               <Download className="size-4" /> Export Logs
@@ -251,164 +278,260 @@ export function AuditLogsPage() {
           }
         />
 
-        <div className="mb-5 flex flex-wrap gap-3">
-          <div className="relative min-w-[240px] flex-1">
-            <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#9CA3AF]" />
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl p-4" style={{ background: C.white, border: `1px solid ${C.border}` }}>
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2" style={{ color: C.textTertiary }} />
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Search actions, actors or targets"
-              className="h-11 w-full rounded-lg border border-[#D9E0E8] bg-white pl-10 pr-4 text-sm text-[#172033] outline-none placeholder:text-[#9CA3AF] focus:border-[#1565D8]"
+              placeholder="Search by action, user or module"
+              className="h-10 w-full rounded-lg border pl-10 pr-4 text-[13.5px] outline-none"
+              style={{ borderColor: C.border, color: C.textPrimary }}
+              onFocus={e => { e.currentTarget.style.borderColor = C.blue }}
+              onBlur={e =>  { e.currentTarget.style.borderColor = C.border }}
             />
           </div>
-          <select className="h-11 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#374151] outline-none">
-            <option>All Roles</option>
-            <option>Super Admin</option>
-            <option>Admin</option>
-          </select>
-          <select className="h-11 rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#374151] outline-none">
-            <option>All Actions</option>
+          <select className="h-10 rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }}>
+            <option value="">All Actions</option>
             <option>Timetable Published</option>
             <option>Student Account Created</option>
             <option>Role Changed</option>
+            <option>Login Failed</option>
           </select>
+          <select className="h-10 rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }}>
+            <option value="">All Users</option>
+            {['Anita Kulkarni','Suresh Rao','Preeti Sharma'].map(u => <option key={u}>{u}</option>)}
+          </select>
+          <input type="date" className="h-10 rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }} />
+          <button onClick={() => setQuery('')} className={secondaryButton}>Reset</button>
         </div>
 
         <Panel>
-          <div className="flex items-center justify-between px-5 py-4">
-            <h2 className="text-base font-700 text-[#0B1F3A]">Activity History</h2>
-            <span className="text-xs text-[#64748B]">{filtered.length} entries</span>
+          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+            <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Activity History</h2>
+            <span className="text-[13px]" style={{ color: C.textTertiary }}>
+              {filtered.length} entries found
+            </span>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-sm">
-              <thead className="border-y border-[#D9E0E8] bg-[#F7F9FC] text-[11px] font-700 uppercase tracking-wider text-[#64748B]">
+            <table className="w-full min-w-[900px] text-left">
+              <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
                 <tr>
-                  {['Actor / Role', 'Action', 'Target', 'Timestamp', 'Type'].map(h => (
-                    <th key={h} className="px-5 py-3">{h}</th>
+                  {['#','Date & Time','User','Action','Module','Details','IP Address'].map(h => (
+                    <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.textSecondary }}>{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1F5F9]">
-                {filtered.map((entry, i) => (
-                  <tr key={i} className="hover:bg-[#F7F9FC] transition-colors">
-                    <td className="px-5 py-4">
-                      <p className="font-600 text-[#0B1F3A]">{entry.actor}</p>
-                      <p className="mt-0.5 text-xs text-[#64748B]">{entry.role}</p>
+              <tbody>
+                {filtered.map((e, i) => (
+                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}` }}
+                    onMouseEnter={e2 => (e2.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
+                    onMouseLeave={e2 => (e2.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                  >
+                    <td className="px-5 py-[13px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                    <td className="px-5 py-[13px] whitespace-nowrap text-[13px]" style={{ color: C.textSecondary }}>{e.dt}</td>
+                    <td className="px-5 py-[13px] text-[13.5px] font-medium" style={{ color: C.navy }}>{e.user}</td>
+                    <td className="px-5 py-[13px] text-[13.5px] font-medium" style={{ color: C.navy }}>{e.action}</td>
+                    <td className="px-5 py-[13px]">
+                      <StatusBadge tone={actionTone[e.module] ?? 'navy'}>{e.module}</StatusBadge>
                     </td>
-                    <td className="px-5 py-4 font-600 text-[#374151]">{entry.action}</td>
-                    <td className="px-5 py-4 text-[13px] text-[#64748B]">{entry.target}</td>
-                    <td className="px-5 py-4 whitespace-nowrap text-[13px] text-[#64748B]">{entry.time}</td>
-                    <td className="px-5 py-4">
-                      <span className={`rounded-full border border-current/10 px-2.5 py-1 text-[11px] font-700 uppercase tracking-wide ${typeStyle[entry.type]}`}>
-                        {entry.type}
-                      </span>
-                    </td>
+                    <td className="px-5 py-[13px] text-[13px]" style={{ color: C.textSecondary }}>{e.details}</td>
+                    <td className="px-5 py-[13px] text-[13px] font-mono" style={{ color: C.textTertiary }}>{e.ip}</td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-5 py-16 text-center">
-                      <ClipboardList className="mx-auto size-10 text-[#D9E0E8]" />
-                      <p className="mt-3 font-600 text-[#0B1F3A]">No audit entries found.</p>
+                    <td colSpan={7} className="py-16 text-center">
+                      <ClipboardList className="mx-auto size-10 mb-3" style={{ color: C.border }} />
+                      <p className="font-semibold" style={{ color: C.navy }}>No audit entries found.</p>
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderTop: `1px solid ${C.border}` }}>
+            <p className="text-[13px]" style={{ color: C.textTertiary }}>
+              Showing <span className="font-semibold" style={{ color: C.navy }}>{filtered.length}</span> of <span className="font-semibold" style={{ color: C.navy }}>248</span> entries
+            </p>
+            <div className="flex gap-1">
+              {[1, 2, 3, '…', 32].map((p, i) => (
+                <button key={i} className="flex size-8 items-center justify-center rounded-lg text-[13px] font-medium" style={p === 1 ? { background: C.blue, color: C.white } : { color: C.textSecondary }}>
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
         </Panel>
-
-        <div className="mt-5">
-          <Notice>Audit logs are read-only and retained for compliance purposes.</Notice>
-        </div>
       </AdminContent>
     </AdminShell>
   )
 }
 
-// ── Reports ───────────────────────────────────────────────────────────────────
+// ─── Reports & Analytics ──────────────────────────────────────────────────────
 const reportTypes = [
-  { icon: GraduationCap, title: 'Student Attendance Report', desc: 'Consolidated attendance for all students', tone: 'blue' },
-  { icon: BarChart3, title: 'Department-wise Attendance', desc: 'Attendance statistics by department', tone: 'green' },
-  { icon: Users, title: 'Faculty Activity Report', desc: 'Faculty class delivery and timetable data', tone: 'purple' },
-  { icon: SlidersHorizontal, title: 'Low Attendance Students', desc: 'Students with attendance below threshold', tone: 'orange' },
-  { icon: FileText, title: 'Semester Summary Report', desc: 'Complete academic semester overview', tone: 'navy' },
-  { icon: ClipboardList, title: 'Timetable Utilization Report', desc: 'Room and timetable slot usage data', tone: 'blue' },
+  { icon: GraduationCap,    title: 'Attendance Report',        desc: 'Daily / Monthly attendance report',      color: C.blue,   bg: C.blueLight   },
+  { icon: Users,            title: 'Student List Report',      desc: 'By department, year, section',           color: C.green,  bg: C.greenLight  },
+  { icon: BarChart3,        title: 'Subject-wise Attendance',  desc: 'Attendance by subject / class',          color: C.purple, bg: C.purpleLight },
+  { icon: ClipboardList,    title: 'Timetable Report',         desc: 'Class timetable summary',                color: C.orange, bg: C.orangeLight },
+  { icon: SlidersHorizontal,title: 'Inactive Students Report', desc: 'Students with low attendance',           color: C.red,    bg: C.redLight    },
 ]
 
+const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep']
+const attendance = [68, 72, 76, 80, 82]
+
 export function ReportsPage() {
-  const [downloaded, setDownloaded] = useState<string | null>(null)
-  const toneClass: Record<string, string> = {
-    blue:   'bg-[#EAF3FF] text-[#1565D8]',
-    green:  'bg-emerald-50 text-emerald-700',
-    purple: 'bg-violet-50 text-violet-700',
-    orange: 'bg-orange-50 text-orange-700',
-    navy:   'bg-[#F1F5F9] text-[#374151]',
-  }
+  const [activeTab, setActiveTab] = useState('Overview')
+  const [toast, setToast] = useState<string | null>(null)
+  const tabs = ['Overview', 'Attendance', 'Academics', 'Users']
+
+  const maxVal = Math.max(...attendance)
 
   return (
     <AdminShell>
       <AdminContent>
-        <PageHeader title="Reports & Analytics" description="Generate and download institutional attendance and activity reports." />
+        <PageHeader
+          title="Reports & Analytics"
+          description="Gain insights into attendance, academics and system usage."
+          actions={
+            <>
+              <input type="date" className="h-10 rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }} />
+              <button className={primaryButton}>
+                <Download className="size-4" /> Export Reports
+              </button>
+            </>
+          }
+        />
 
-        {/* Filters */}
-        <Panel className="mb-6">
-          <div className="grid gap-4 p-5 md:grid-cols-4">
-            {[
-              ['Department', ['CSE', 'ECE', 'IT', 'ME']],
-              ['Year', ['3rd Year', '2nd Year', '1st Year']],
-              ['Semester', ['5', '4', '3']],
-              ['Date Range', ['May 2024', 'Apr 2024']],
-            ].map(([label, options]) => (
-              <label key={label as string} className="block">
-                <span className="text-[13px] font-600 text-[#374151]">{label as string}</span>
-                <select className="mt-1.5 h-11 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172033] outline-none focus:border-[#1565D8]">
-                  {(options as string[]).map(o => <option key={o}>{o}</option>)}
-                </select>
-              </label>
-            ))}
-          </div>
-        </Panel>
+        {/* Tabs */}
+        <div className="mb-6 flex rounded-xl bg-white p-1 w-fit" style={{ border: `1px solid ${C.border}` }}>
+          {tabs.map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className="rounded-lg px-5 py-2 text-[13.5px] font-medium transition-all"
+              style={
+                activeTab === tab
+                  ? { background: C.blue, color: C.white, fontWeight: 600 }
+                  : { color: C.textSecondary }
+              }
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-        {/* Report cards */}
-        <h2 className="mb-4 text-[15px] font-700 text-[#0B1F3A]">Available Reports</h2>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {reportTypes.map(r => {
-            const Icon = r.icon
+        {/* Summary cards */}
+        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: 'Total Students',  value: '2,856', icon: GraduationCap,     color: C.blue   },
+            { label: 'Total Faculty',   value: '156',   icon: Users,             color: C.green  },
+            { label: 'Total Classes',   value: '128',   icon: ClipboardList,     color: C.purple },
+            { label: 'Avg. Attendance', value: '82%',   icon: SlidersHorizontal, color: C.orange },
+          ].map(item => {
+            const Icon = item.icon
             return (
-              <Panel key={r.title} className="p-5 flex flex-col">
-                <div className="flex items-start gap-3">
-                  <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${toneClass[r.tone]}`}>
-                    <Icon className="size-5" />
-                  </div>
+              <div key={item.label} className="rounded-xl p-5" style={{ background: C.white, border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(7,27,73,0.05)' }}>
+                <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-700 text-[#0B1F3A]">{r.title}</h3>
-                    <p className="mt-0.5 text-xs text-[#64748B]">{r.desc}</p>
+                    <p className="text-[12.5px] font-medium" style={{ color: C.textTertiary }}>{item.label}</p>
+                    <p className="mt-2 text-[32px] font-bold leading-none" style={{ color: C.navy }}>{item.value}</p>
+                  </div>
+                  <div className="flex size-10 items-center justify-center rounded-xl" style={{ background: C.blueLight }}>
+                    <Icon className="size-5" style={{ color: item.color }} />
                   </div>
                 </div>
-                <div className="mt-5 flex gap-2">
-                  <button
-                    onClick={() => setDownloaded(r.title)}
-                    className={`${secondaryButton} flex-1 text-xs`}
-                  >
-                    <Download className="size-3.5" /> Download PDF
-                  </button>
-                  <button
-                    onClick={() => setDownloaded(`${r.title} (Excel)`)}
-                    className={`${secondaryButton} flex-1 text-xs`}
-                  >
-                    <FileSpreadsheet className="size-3.5" /> Download Excel
-                  </button>
-                </div>
-              </Panel>
+              </div>
             )
           })}
         </div>
 
-        {downloaded && (
-          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl bg-[#0B1F3A] px-5 py-3.5 text-sm font-600 text-white shadow-[0_20px_60px_rgb(11_31_58/0.18)]">
-            <CheckCircle2 className="size-4 text-emerald-400" />
-            Downloading: {downloaded}
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+          {/* Popular reports */}
+          <Panel title="Popular Reports">
+            <div className="divide-y" style={{ borderColor: C.border }}>
+              {reportTypes.map(r => {
+                const Icon = r.icon
+                return (
+                  <div key={r.title} className="flex items-center gap-4 px-5 py-4">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl" style={{ background: r.bg }}>
+                      <Icon className="size-5" style={{ color: r.color }} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>{r.title}</p>
+                      <p className="mt-0.5 text-[12.5px]" style={{ color: C.textTertiary }}>{r.desc}</p>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <button onClick={() => setToast(`${r.title} (PDF)`)} className={`${secondaryButton} h-8 px-3 text-[12px]`}>
+                        <FileText className="size-3.5" /> PDF
+                      </button>
+                      <button onClick={() => setToast(`${r.title} (Excel)`)} className={`${secondaryButton} h-8 px-3 text-[12px]`}>
+                        <Download className="size-3.5" /> Excel
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </Panel>
+
+          {/* Attendance trend */}
+          <div className="space-y-4">
+            <Panel title="Attendance Trend">
+              <div className="p-5">
+                <p className="text-[12.5px] font-medium mb-4" style={{ color: C.textTertiary }}>
+                  Monthly Attendance (%)
+                </p>
+                {/* Simple bar chart */}
+                <div className="flex items-end gap-2 h-32">
+                  {attendance.map((val, i) => (
+                    <div key={months[i]} className="flex-1 flex flex-col items-center gap-1">
+                      <span className="text-[11px] font-semibold" style={{ color: C.navy }}>{val}%</span>
+                      <div
+                        className="w-full rounded-t-md transition-all"
+                        style={{
+                          height: `${(val / maxVal) * 80}%`,
+                          background: i === attendance.length - 1 ? C.blue : C.blueLight,
+                          minHeight: '8px',
+                        }}
+                      />
+                      <span className="text-[11px]" style={{ color: C.textTertiary }}>{months[i]}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Trend icon */}
+                <div className="mt-4 flex items-center gap-2 pt-3" style={{ borderTop: `1px solid ${C.border}` }}>
+                  <TrendingUp className="size-4" style={{ color: C.green }} />
+                  <span className="text-[12.5px] font-medium" style={{ color: C.green }}>+14% improvement over 5 months</span>
+                </div>
+              </div>
+            </Panel>
+
+            <Panel title="Attendance Highlights">
+              <div className="divide-y p-5 space-y-3" style={{ borderColor: C.border }}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[12.5px]" style={{ color: C.textTertiary }}>Highest Attendance</p>
+                    <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>Mathematics — CSE 3A</p>
+                  </div>
+                  <span className="text-[22px] font-bold" style={{ color: C.green }}>92%</span>
+                </div>
+                <div className="flex items-center justify-between pt-3">
+                  <div>
+                    <p className="text-[12.5px]" style={{ color: C.textTertiary }}>Lowest Attendance</p>
+                    <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>OS Lab — CSE 3B</p>
+                  </div>
+                  <span className="text-[22px] font-bold" style={{ color: C.red }}>68%</span>
+                </div>
+              </div>
+            </Panel>
+          </div>
+        </div>
+
+        {toast && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl px-5 py-3.5 text-[13.5px] font-semibold shadow-[0_20px_60px_rgba(7,27,73,0.18)]" style={{ background: C.green, color: C.white }}>
+            <CheckCircle2 className="size-4" />
+            Downloading: {toast}
           </div>
         )}
       </AdminContent>
@@ -416,165 +539,221 @@ export function ReportsPage() {
   )
 }
 
-// ── Settings ──────────────────────────────────────────────────────────────────
-const settingsSections = [
-  { icon: BookOpen, label: 'Academic Year', desc: 'Configure active academic year', value: '2024–25' },
-  { icon: SlidersHorizontal, label: 'Attendance Threshold', desc: 'Minimum attendance % for alerts', value: '75%' },
-  { icon: Bell, label: 'Notification Preferences', desc: 'Low-attendance and system alerts', value: 'Enabled' },
-  { icon: LockKeyhole, label: 'Password Policy', desc: 'Complexity and rotation rules', value: 'Strong — 90 days' },
-  { icon: Monitor, label: 'Session Timeout', desc: 'Automatic logout after inactivity', value: '30 minutes' },
-  { icon: Shield, label: 'Two-Factor Authentication', desc: 'Admin account 2FA requirement', value: 'Disabled' },
+// ─── System Settings ──────────────────────────────────────────────────────────
+const settingsSidebar = [
+  { key: 'institution', label: 'Institution Information', icon: BookOpen },
+  { key: 'academic',    label: 'Academic Settings',       icon: GraduationCap },
+  { key: 'attendance',  label: 'Attendance Settings',     icon: SlidersHorizontal },
+  { key: 'notification',label: 'Notification Settings',   icon: Bell },
+  { key: 'security',    label: 'Security Settings',       icon: LockKeyhole },
+  { key: 'backup',      label: 'Backup & Restore',        icon: RefreshCcw },
+  { key: 'integration', label: 'Integration Settings',    icon: Monitor },
+  { key: 'preferences', label: 'System Preferences',      icon: SlidersHorizontal },
 ]
 
 export function SettingsPage() {
+  const [activeSection, setActiveSection] = useState('institution')
   const [saved, setSaved] = useState(false)
-  const [theme, setTheme] = useState('Light')
   const [notif, setNotif] = useState(true)
   const [twofa, setTwofa] = useState(false)
-  const [year, setYear] = useState('2024–25')
   const [threshold, setThreshold] = useState('75')
 
   return (
     <AdminShell>
       <AdminContent>
-        <PageHeader title="System Settings" description="Manage platform configuration for SmartAttend Admin Console." />
+        <PageHeader
+          title="System Settings"
+          description="Configure the system as per your institution's requirements."
+        />
 
-        <div className="grid gap-5 lg:grid-cols-3">
-          {settingsSections.map(s => {
-            const Icon = s.icon
-            return (
-              <Panel key={s.label} className="p-5 flex gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#EAF3FF] text-[#1565D8]">
-                  <Icon className="size-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-700 text-[#0B1F3A]">{s.label}</p>
-                  <p className="text-xs text-[#64748B]">{s.desc}</p>
-                  <p className="mt-2 text-xs font-700 text-[#1565D8]">{s.value}</p>
-                </div>
-              </Panel>
-            )
-          })}
-        </div>
-
-        <Panel title="Edit Settings" className="mt-6">
-          <div className="grid gap-5 p-5 md:grid-cols-2">
-            <label className="block">
-              <span className="text-[13px] font-600 text-[#374151]">Academic Year</span>
-              <select
-                value={year}
-                onChange={e => setYear(e.target.value)}
-                className="mt-1.5 h-11 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172033] outline-none focus:border-[#1565D8]"
-              >
-                {['2023–24', '2024–25', '2025–26'].map(y => <option key={y}>{y}</option>)}
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-[13px] font-600 text-[#374151]">Attendance Threshold (%)</span>
-              <input
-                type="number"
-                min={50} max={100}
-                value={threshold}
-                onChange={e => setThreshold(e.target.value)}
-                className="mt-1.5 h-11 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172033] outline-none focus:border-[#1565D8]"
-              />
-            </label>
-
-            <label className="block">
-              <span className="text-[13px] font-600 text-[#374151]">Theme</span>
-              <select
-                value={theme}
-                onChange={e => setTheme(e.target.value)}
-                className="mt-1.5 h-11 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172033] outline-none focus:border-[#1565D8]"
-              >
-                <option>Light</option>
-                <option>Dark</option>
-                <option>System</option>
-              </select>
-            </label>
-
-            <div className="flex flex-col justify-end">
-              <label className="flex items-center gap-3 rounded-lg border border-[#D9E0E8] px-4 py-3">
-                <div className="flex-1">
-                  <p className="text-[13px] font-600 text-[#374151]">Notifications</p>
-                  <p className="text-xs text-[#64748B]">Low-attendance and system alerts</p>
-                </div>
-                <button
-                  type="button"
-                  aria-label="Toggle notifications"
-                  onClick={() => setNotif(!notif)}
-                  className={`h-6 w-11 rounded-full transition-colors ${notif ? 'bg-[#1565D8]' : 'bg-[#D9E0E8]'}`}
-                >
-                  <div className={`size-5 rounded-full bg-white shadow transition-transform mx-0.5 ${notif ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
-              </label>
-            </div>
-
-            <div className="flex flex-col justify-end">
-              <label className="flex items-center gap-3 rounded-lg border border-[#D9E0E8] px-4 py-3">
-                <div className="flex-1">
-                  <p className="text-[13px] font-600 text-[#374151]">Two-Factor Authentication</p>
-                  <p className="text-xs text-[#64748B]">Require 2FA for admin accounts</p>
-                </div>
-                <button
-                  type="button"
-                  aria-label="Toggle 2FA"
-                  onClick={() => setTwofa(!twofa)}
-                  className={`h-6 w-11 rounded-full transition-colors ${twofa ? 'bg-[#1565D8]' : 'bg-[#D9E0E8]'}`}
-                >
-                  <div className={`size-5 rounded-full bg-white shadow transition-transform mx-0.5 ${twofa ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
-              </label>
+        <div className="flex gap-6">
+          {/* Left sidebar */}
+          <div
+            className="w-56 shrink-0 rounded-xl bg-white self-start"
+            style={{ border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(7,27,73,0.05)' }}
+          >
+            <div className="p-3 space-y-0.5">
+              {settingsSidebar.map(item => {
+                const active = activeSection === item.key
+                const Icon = item.icon
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => setActiveSection(item.key)}
+                    className="w-full flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] transition-colors text-left"
+                    style={{
+                      background: active ? C.blueLight : 'transparent',
+                      color:      active ? C.blue      : C.textSecondary,
+                      fontWeight: active ? 600 : 400,
+                    }}
+                  >
+                    <Icon className="size-4 shrink-0" style={{ color: active ? C.blue : C.textTertiary }} />
+                    {item.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-end gap-2 border-t border-[#D9E0E8] p-5">
-            <button className={secondaryButton}>Reset to Defaults</button>
-            <button onClick={() => setSaved(true)} className={primaryButton}>
-              <Save className="size-4" /> Save Settings
-            </button>
-          </div>
-        </Panel>
+          {/* Right main content */}
+          <div className="flex-1 min-w-0 space-y-5">
+            <Panel>
+              <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+                <div>
+                  <h2 className="text-[16px] font-semibold" style={{ color: C.navy }}>Institution Information</h2>
+                  <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>Manage your college details and branding.</p>
+                </div>
+                <button onClick={() => setSaved(true)} className={primaryButton}>
+                  <Save className="size-4" /> Save Changes
+                </button>
+              </div>
 
-        <div className="mt-5">
-          <Notice>Settings changes are logged in the Audit Log and may require admin approval.</Notice>
+              <div className="grid gap-6 p-5 lg:grid-cols-[1fr_200px]">
+                <div className="space-y-4">
+                  {([
+                    ['College Name',    'ABC Engineering College',        'text'],
+                    ['Address',        '123 Main Road, Bangalore - 560001','text'],
+                    ['Contact Number', '+91 80 2345 6789',                'text'],
+                    ['Email',          'admin@abc.edu.in',                'email'],
+                    ['Website',        'www.abc.edu.in',                  'text'],
+                  ] as [string,string,string][]).map(([label, val, type]) => (
+                    <label key={label} className="block">
+                      <span className="block text-[13px] font-medium mb-1.5" style={{ color: C.textSecondary }}>{label}</span>
+                      <input
+                        type={type}
+                        defaultValue={val}
+                        className="h-10 w-full rounded-lg border bg-white px-3 text-[13.5px] outline-none transition-all"
+                        style={{ borderColor: C.border, color: C.textPrimary }}
+                        onFocus={e => { e.currentTarget.style.borderColor = C.blue }}
+                        onBlur={e =>  { e.currentTarget.style.borderColor = C.border }}
+                      />
+                    </label>
+                  ))}
+                </div>
+
+                {/* Logo */}
+                <div className="flex flex-col items-center">
+                  <p className="mb-3 text-[13px] font-medium" style={{ color: C.textSecondary }}>College Logo</p>
+                  <div
+                    className="flex size-28 items-center justify-center rounded-2xl"
+                    style={{ background: C.blueLight, border: `1px solid ${C.border}` }}
+                  >
+                    <Shield className="size-12" style={{ color: C.blue }} />
+                  </div>
+                  <button className={`${secondaryButton} mt-3 w-full text-[12.5px]`}>
+                    Change Logo
+                  </button>
+                </div>
+              </div>
+            </Panel>
+
+            {/* Additional settings */}
+            <Panel title="Quick Settings">
+              <div className="grid gap-5 p-5 sm:grid-cols-2">
+                <label className="block">
+                  <span className="block text-[13px] font-medium mb-1.5" style={{ color: C.textSecondary }}>Academic Year</span>
+                  <select className="h-10 w-full rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }}>
+                    {['2023–24','2024–25','2025–26'].map(y => <option key={y}>{y}</option>)}
+                  </select>
+                </label>
+
+                <label className="block">
+                  <span className="block text-[13px] font-medium mb-1.5" style={{ color: C.textSecondary }}>Attendance Threshold (%)</span>
+                  <input
+                    type="number"
+                    min={50} max={100}
+                    value={threshold}
+                    onChange={e => setThreshold(e.target.value)}
+                    className="h-10 w-full rounded-lg border bg-white px-3 text-[13.5px] outline-none"
+                    style={{ borderColor: C.border, color: C.textPrimary }}
+                  />
+                </label>
+
+                {/* Toggle: Notifications */}
+                <div className="flex items-center justify-between rounded-xl p-4" style={{ border: `1px solid ${C.border}` }}>
+                  <div>
+                    <p className="text-[13px] font-medium" style={{ color: C.navy }}>Notifications</p>
+                    <p className="text-[12px]" style={{ color: C.textTertiary }}>Low-attendance alerts</p>
+                  </div>
+                  <button
+                    onClick={() => setNotif(!notif)}
+                    className="h-6 w-11 rounded-full transition-colors relative"
+                    style={{ background: notif ? C.blue : C.border }}
+                  >
+                    <div
+                      className="absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform"
+                      style={{ left: '2px', transform: notif ? 'translateX(20px)' : 'translateX(0)' }}
+                    />
+                  </button>
+                </div>
+
+                {/* Toggle: 2FA */}
+                <div className="flex items-center justify-between rounded-xl p-4" style={{ border: `1px solid ${C.border}` }}>
+                  <div>
+                    <p className="text-[13px] font-medium" style={{ color: C.navy }}>Two-Factor Auth</p>
+                    <p className="text-[12px]" style={{ color: C.textTertiary }}>Require 2FA for admins</p>
+                  </div>
+                  <button
+                    onClick={() => setTwofa(!twofa)}
+                    className="h-6 w-11 rounded-full transition-colors relative"
+                    style={{ background: twofa ? C.blue : C.border }}
+                  >
+                    <div
+                      className="absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform"
+                      style={{ left: '2px', transform: twofa ? 'translateX(20px)' : 'translateX(0)' }}
+                    />
+                  </button>
+                </div>
+              </div>
+            </Panel>
+
+            {/* Info notice */}
+            <div className="flex items-start gap-3 rounded-xl p-4" style={{ background: C.blueLight, border: `1px solid #BFDBFE` }}>
+              <Info className="mt-0.5 size-4 shrink-0" style={{ color: C.blue }} />
+              <p className="text-[13px]" style={{ color: C.textSecondary }}>
+                These details will be used across the system, including reports and communications.
+              </p>
+            </div>
+          </div>
         </div>
       </AdminContent>
-
       {saved && <Toast message="Settings saved successfully." />}
     </AdminShell>
   )
 }
 
-// ── Timetable Publish ─────────────────────────────────────────────────────────
-const publishCriteria = [
-  { label: 'All Subjects Scheduled', met: true },
-  { label: 'No Room Conflicts', met: true },
-  { label: 'No Faculty Conflicts', met: true },
-  { label: 'Timetable Reviewed', met: true },
-  { label: 'Pending Approval', met: false },
+// ─── Timetable Publish ────────────────────────────────────────────────────────
+const publishRows = [
+  { dept: 'CSE', sem: '5', section: 'CSE 3A', status: 'Draft',     date: '20 May 2024' },
+  { dept: 'CSE', sem: '5', section: 'CSE 3B', status: 'Published', date: '15 May 2024' },
+  { dept: 'ECE', sem: '4', section: 'ECE 3A', status: 'Draft',     date: '20 May 2024' },
+  { dept: 'IT',  sem: '5', section: 'IT 3A',  status: 'Published', date: '15 May 2024' },
 ]
 
-const publishRows = [
-  ['CSE', '5', 'CSE 3A', 'Draft', '20 May 2024'],
-  ['CSE', '5', 'CSE 3B', 'Published', '15 May 2024'],
-  ['ECE', '4', 'ECE 3A', 'Draft', '20 May 2024'],
-  ['IT', '5', 'IT 3A', 'Published', '15 May 2024'],
-]
+const timetableGrid = {
+  times: ['09:00–10:00', '10:00–11:00', '11:15–12:15', '02:00–03:00', '03:00–04:00'],
+  days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+  data: [
+    ['Maths','DS','Physics','Maths','DS'],
+    ['DS','OS','Maths','DSP','OS'],
+    ['Physics','Maths','DS','OS','Physics'],
+    ['Lab','Lab','DS','Maths','Lab'],
+    ['OS','Physics','OS','DS','Maths'],
+  ],
+}
 
 export function TimetablePublishPage() {
-  const [confirm, setConfirm] = useState(false)
-  const [selected, setSelected] = useState('CSE 3A')
-  const [done, setDone] = useState(false)
-  const allMet = publishCriteria.filter(c => c.met).length >= 4
+  const [confirm, setConfirm]   = useState<string | null>(null)
+  const [done, setDone]         = useState(false)
+  const [faculty, setFaculty]   = useState(true)
+  const [students, setStudents] = useState(true)
 
   return (
     <AdminShell>
       <AdminContent>
         <PageHeader
-          title="Timetable Publish"
-          description="Review, validate and publish approved timetable records."
+          title="Publish Timetable"
+          description="Make the timetable visible to faculty and students after verification."
           actions={
             <Link href="/admin/timetable" className={secondaryButton}>
               <ArrowLeft className="size-4" /> Back
@@ -582,124 +761,142 @@ export function TimetablePublishPage() {
           }
         />
 
-        {/* Summary stats */}
-        <div className="mb-6 grid gap-4 sm:grid-cols-3">
-          {[
-            { label: 'Total Sections', value: '24', icon: Users, tone: 'blue' },
-            { label: 'Draft', value: '8', icon: ClipboardList, tone: 'orange' },
-            { label: 'Published', value: '16', icon: CheckCircle2, tone: 'green' },
-          ].map(item => {
-            const Icon = item.icon
-            return (
-              <Panel key={item.label} className="p-5 flex items-center gap-4">
-                <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${
-                  item.tone === 'blue'   ? 'bg-[#EAF3FF] text-[#1565D8]' :
-                  item.tone === 'orange' ? 'bg-orange-50 text-orange-600' :
-                  'bg-emerald-50 text-emerald-600'
-                }`}>
-                  <Icon className="size-5" />
-                </div>
-                <div>
-                  <p className="text-xs text-[#64748B]">{item.label}</p>
-                  <p className="text-[28px] font-800 text-[#0B1F3A] leading-none">{item.value}</p>
-                </div>
-              </Panel>
-            )
-          })}
-        </div>
-
-        <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
-          {/* Status table */}
-          <Panel>
-            <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-              <h2 className="font-700 text-[#0B1F3A]">Publish Status by Section</h2>
-              <button
-                onClick={() => { setSelected('CSE 3A'); setConfirm(true) }}
-                className={primaryButton}
-              >
-                Publish Selected
-              </button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px] text-left text-sm">
-                <thead className="border-y border-[#D9E0E8] bg-[#F7F9FC] text-[11px] font-700 uppercase tracking-wider text-[#64748B]">
-                  <tr>
-                    {['Dept.', 'Sem.', 'Section', 'Status', 'Last Updated', 'Action'].map(h => (
-                      <th key={h} className="px-4 py-3">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#F1F5F9]">
-                  {publishRows.map(row => (
-                    <tr key={row[2]} className="hover:bg-[#F7F9FC] transition-colors">
-                      <td className="px-4 py-3 font-600 text-[#0B1F3A]">{row[0]}</td>
-                      <td className="px-4 py-3 text-[#374151]">{row[1]}</td>
-                      <td className="px-4 py-3 text-[#374151]">{row[2]}</td>
-                      <td className="px-4 py-3">
-                        <StatusBadge tone={row[3] === 'Published' ? 'green' : 'orange'}>{row[3]}</StatusBadge>
-                      </td>
-                      <td className="px-4 py-3 text-[#64748B] whitespace-nowrap">{row[4]}</td>
-                      <td className="px-4 py-3">
-                        {row[3] !== 'Published' && (
-                          <button
-                            onClick={() => { setSelected(row[2]); setConfirm(true) }}
-                            className={`${primaryButton} h-8 px-3 text-xs`}
-                          >
-                            Publish
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Panel>
-
-          {/* Checklist */}
+        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+          {/* Left — Publish summary */}
           <div className="space-y-4">
-            <Panel title="Publish Readiness Checklist">
+            <Panel title="Publish Summary">
               <div className="p-5 space-y-3">
-                {publishCriteria.map(c => (
-                  <div key={c.label} className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-sm ${
-                    c.met ? 'border-emerald-100 bg-emerald-50' : 'border-orange-100 bg-orange-50'
-                  }`}>
-                    {c.met
-                      ? <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-                      : <AlertTriangle className="size-4 text-orange-600 shrink-0" />}
-                    <span className={`font-600 ${c.met ? 'text-emerald-800' : 'text-orange-800'}`}>
-                      {c.label}
-                    </span>
+                {[
+                  ['Academic Session', 'Aug 2025 – Dec 2025'],
+                  ['Departments',      'CSE, ECE, ME, CE, IT, AE'],
+                  ['Classes',          '96'],
+                  ['Total Entries',    '1,248'],
+                ].map(([l, v]) => (
+                  <div key={l} className="flex items-start justify-between gap-2 py-2" style={{ borderBottom: `1px solid ${C.border}` }}>
+                    <span className="text-[13px]" style={{ color: C.textTertiary }}>{l}</span>
+                    <span className="text-[13.5px] font-semibold text-right" style={{ color: C.navy }}>{v}</span>
                   </div>
                 ))}
               </div>
-              {allMet && (
-                <div className="mx-5 mb-5 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
-                  <p className="text-sm font-700 text-emerald-800">
-                    Timetable is ready to publish. One item pending approval.
-                  </p>
-                </div>
-              )}
+
+              <div className="px-5 pb-5 space-y-3">
+                <p className="text-[13px] font-semibold" style={{ color: C.navy }}>Publish To</p>
+                {[
+                  { label: 'Faculty', sub: '156 faculty members will get access', checked: faculty, toggle: () => setFaculty(!faculty) },
+                  { label: 'Students', sub: '2,856 students will get access',     checked: students, toggle: () => setStudents(!students) },
+                ].map(item => (
+                  <label key={item.label} className="flex items-center gap-3 cursor-pointer rounded-xl p-3" style={{ border: `1px solid ${C.border}` }}>
+                    <input type="checkbox" checked={item.checked} onChange={item.toggle} className="size-4 rounded" style={{ accentColor: C.blue }} />
+                    <div>
+                      <p className="text-[13.5px] font-medium" style={{ color: C.navy }}>{item.label}</p>
+                      <p className="text-[12px]" style={{ color: C.textTertiary }}>{item.sub}</p>
+                    </div>
+                  </label>
+                ))}
+
+                <p className="text-[13px] font-semibold mt-4" style={{ color: C.navy }}>Publish Date & Time</p>
+                <input type="date" className="h-10 w-full rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }} />
+                <input type="time" className="h-10 w-full rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }} />
+
+                <button onClick={() => setConfirm('All Sections')} className={`${primaryButton} w-full mt-2`}>
+                  Publish Timetable
+                </button>
+              </div>
             </Panel>
 
-            <Notice>
-              Once published, students and faculty will see the updated timetable immediately in SmartAttend.
-            </Notice>
+            <div className="flex items-start gap-3 rounded-xl p-4" style={{ background: C.greenLight, border: `1px solid #BBF7D0` }}>
+              <CheckCircle2 className="mt-0.5 size-4 shrink-0" style={{ color: C.green }} />
+              <p className="text-[13px]" style={{ color: '#14532D' }}>
+                Timetable is ready to be published. Once published, it will be visible in the student and faculty portals.
+              </p>
+            </div>
+          </div>
+
+          {/* Right — Status table + preview */}
+          <div className="space-y-5">
+            <Panel title="Publish Status by Section">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                    <tr>
+                      {['Dept.','Sem.','Section','Status','Last Updated','Action'].map(h => (
+                        <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.textSecondary }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {publishRows.map(row => (
+                      <tr key={row.section} style={{ borderBottom: `1px solid ${C.border}` }}
+                        onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
+                        onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                      >
+                        <td className="px-5 py-[14px] text-[13.5px] font-semibold" style={{ color: C.navy }}>{row.dept}</td>
+                        <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{row.sem}</td>
+                        <td className="px-5 py-[14px] text-[13.5px] font-medium" style={{ color: C.navy }}>{row.section}</td>
+                        <td className="px-5 py-[14px]"><StatusBadge tone={row.status === 'Published' ? 'green' : 'orange'}>{row.status}</StatusBadge></td>
+                        <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{row.date}</td>
+                        <td className="px-5 py-[14px]">
+                          {row.status !== 'Published' ? (
+                            <button onClick={() => setConfirm(row.section)} className={`${primaryButton} h-8 px-3 text-[12.5px]`}>
+                              Publish
+                            </button>
+                          ) : (
+                            <span className="text-[12.5px] font-medium" style={{ color: C.green }}>Live</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+
+            {/* Timetable grid preview */}
+            <Panel title="Timetable Preview">
+              <div className="p-4 overflow-x-auto">
+                <div className="mb-3 flex gap-3">
+                  {[['Department','CSE'],['Year','3rd Year'],['Semester','5'],['Section','CSE 3A']].map(([l, v]) => (
+                    <select key={l} className="h-9 rounded-lg border bg-white px-2 text-[12.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }}>
+                      <option>{v}</option>
+                    </select>
+                  ))}
+                </div>
+                <table className="w-full min-w-[640px] text-left border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="px-3 py-2 text-[11px] font-semibold rounded-tl-lg" style={{ background: C.navy, color: 'rgba(255,255,255,0.7)', width: '100px' }}>Time</th>
+                      {timetableGrid.days.map(d => (
+                        <th key={d} className="px-3 py-2 text-[11px] font-semibold" style={{ background: C.navy, color: C.white }}>{d}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {timetableGrid.times.map((time, i) => (
+                      <tr key={time}>
+                        <td className="px-3 py-2.5 text-[11.5px] font-medium whitespace-nowrap" style={{ background: C.blueLight, color: C.blue, border: `1px solid ${C.border}` }}>{time}</td>
+                        {timetableGrid.days.map((_, j) => (
+                          <td key={j} className="px-3 py-2.5 text-[12px] text-center" style={{ border: `1px solid ${C.border}`, color: C.navy, background: j === 0 && i === 0 ? C.blueLight : C.white }}>
+                            {timetableGrid.data[i][j]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
           </div>
         </div>
       </AdminContent>
 
       {confirm && (
-        <Modal title={`Publish Timetable — ${selected}?`} onClose={() => setConfirm(false)}>
-          <p className="text-sm text-[#4B5563]">
-            The timetable for <strong>{selected}</strong> will be published. Students and faculty will see the update immediately.
+        <Modal title={`Publish Timetable — ${confirm}?`} onClose={() => setConfirm(null)}>
+          <p className="text-[13.5px]" style={{ color: C.textSecondary }}>
+            The timetable for <strong>{confirm}</strong> will be published and immediately visible in the student and faculty portals.
           </p>
           <div className="mt-5 flex justify-end gap-2">
-            <button onClick={() => setConfirm(false)} className={secondaryButton}>Cancel</button>
-            <button
-              onClick={() => { setConfirm(false); setDone(true) }}
-              className={primaryButton}
-            >
+            <button onClick={() => setConfirm(null)} className={secondaryButton}>Cancel</button>
+            <button onClick={() => { setConfirm(null); setDone(true) }} className={primaryButton}>
               Publish Timetable
             </button>
           </div>

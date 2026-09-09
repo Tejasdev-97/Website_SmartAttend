@@ -4,27 +4,68 @@ import Link from 'next/link'
 import { useState } from 'react'
 import {
   AlertTriangle, ArrowLeft, BookOpen, Check, CheckCircle2,
-  ChevronDown, Edit3, FileSpreadsheet, Info, Laptop, Plus,
-  Save, Search, ShieldCheck, Upload, Users, X,
+  ChevronDown, CloudUpload, Edit3, FileSpreadsheet,
+  Laptop, Monitor, Plus, Save, Search, Shield,
+  Smartphone, Upload, Users, X,
 } from 'lucide-react'
 import {
-  AdminContent, AdminShell, PageHeader, Panel,
+  AdminContent, AdminShell, C, PageHeader, Panel,
   primaryButton, secondaryButton, StatusBadge,
 } from './admin-shell'
 
-// ── Shared helpers ─────────────────────────────────────────────────────────────
-type ModalProps = { title: string; children: React.ReactNode; onClose: () => void }
-function Modal({ title, children, onClose }: ModalProps) {
+// ─── Shared helpers ───────────────────────────────────────────────────────────
+function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1F3A]/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl border border-[#D9E0E8] bg-white shadow-modal">
-        <div className="flex items-center justify-between border-b border-[#D9E0E8] px-5 py-4">
-          <h2 className="font-700 text-[#0B1F3A]">{title}</h2>
-          <button
-            aria-label="Close"
-            onClick={onClose}
-            className="rounded-lg p-2 text-[#64748B] hover:bg-slate-50"
+    <span className="block text-[13px] font-medium mb-1.5" style={{ color: C.textSecondary }}>
+      {children}
+      {required && <span className="ml-0.5" style={{ color: C.red }}>*</span>}
+    </span>
+  )
+}
+
+function Field({ label, value, onChange, options, required = true, placeholder }: {
+  label: string; value: string; onChange?: (v: string) => void
+  options?: string[]; required?: boolean; placeholder?: string
+}) {
+  const cls = "h-10 w-full rounded-lg border bg-white text-[13.5px] outline-none transition-all"
+  const style: React.CSSProperties = { borderColor: C.border, color: C.textPrimary, paddingLeft: '0.75rem', paddingRight: options ? '2rem' : '0.75rem' }
+  return (
+    <label className="block">
+      <Label required={required}>{label}</Label>
+      {options ? (
+        <div className="relative">
+          <select value={value} onChange={e => onChange?.(e.target.value)}
+            className={cls} style={style}
           >
+            {placeholder && <option value="">{placeholder}</option>}
+            {options.map(o => <option key={o}>{o}</option>)}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-3.5 -translate-y-1/2" style={{ color: C.textTertiary }} />
+        </div>
+      ) : (
+        <input value={value} onChange={e => onChange?.(e.target.value)}
+          placeholder={placeholder}
+          className={cls} style={{ ...style, paddingRight: '0.75rem' }}
+          onFocus={e => { e.currentTarget.style.borderColor = C.blue; e.currentTarget.style.boxShadow = `0 0 0 3px rgba(11,92,255,0.10)` }}
+          onBlur={e =>  { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = 'none' }}
+        />
+      )}
+    </label>
+  )
+}
+
+function Modal({ title, subtitle, children, onClose }: {
+  title: string; subtitle?: string; children: React.ReactNode; onClose: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(7,27,73,0.30)' }}>
+      <div className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-white" style={{ border: `1px solid ${C.border}`, boxShadow: '0 20px 60px rgba(7,27,73,0.16)' }}>
+        <div className="flex items-start justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+          <div>
+            <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>{title}</h2>
+            {subtitle && <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>{subtitle}</p>}
+          </div>
+          <button aria-label="Close" onClick={onClose} className="ml-4 mt-0.5 rounded-lg p-1.5 hover:bg-[#F5F9FF]" style={{ color: C.textTertiary }}>
             <X className="size-4" />
           </button>
         </div>
@@ -34,202 +75,198 @@ function Modal({ title, children, onClose }: ModalProps) {
   )
 }
 
-function Field({
-  label, value, onChange, options, required = true,
-}: {
-  label: string
-  value: string
-  onChange?: (v: string) => void
-  options?: string[]
-  required?: boolean
-}) {
+function Toast({ message, tone = 'green' }: { message: string; tone?: 'green' | 'blue' }) {
   return (
-    <label className="block">
-      <span className="text-[13px] font-600 text-[#374151]">
-        {label}
-        {required && <span className="text-[#C24141]"> *</span>}
-      </span>
-      <div className="relative mt-1.5">
-        {options ? (
-          <>
-            <select
-              value={value}
-              onChange={e => onChange?.(e.target.value)}
-              className="h-11 w-full appearance-none rounded-lg border border-[#D9E0E8] bg-white px-3 pr-9 text-sm text-[#172033] outline-none focus:border-[#1565D8] focus:ring-3 focus:ring-[#1565D8]/10"
-            >
-              {options.map(o => <option key={o}>{o}</option>)}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#9CA3AF]" />
-          </>
-        ) : (
-          <input
-            value={value}
-            onChange={e => onChange?.(e.target.value)}
-            className="h-11 w-full rounded-lg border border-[#D9E0E8] bg-white px-3 text-sm text-[#172033] outline-none focus:border-[#1565D8] focus:ring-3 focus:ring-[#1565D8]/10"
-          />
-        )}
-      </div>
-    </label>
-  )
-}
-
-function Notice({
-  children, tone = 'blue',
-}: {
-  children: React.ReactNode
-  tone?: 'blue' | 'orange' | 'green'
-}) {
-  const styles = {
-    blue:   'border-blue-100 bg-[#EAF3FF] text-[#1565D8]',
-    orange: 'border-orange-100 bg-orange-50 text-orange-800',
-    green:  'border-emerald-100 bg-emerald-50 text-emerald-800',
-  }
-  return (
-    <div className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${styles[tone]}`}>
-      <Info className="mt-0.5 size-4 shrink-0" />
-      <div>{children}</div>
-    </div>
-  )
-}
-
-function Toast({ message }: { message: string }) {
-  return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl bg-[#0B1F3A] px-5 py-3.5 text-sm font-600 text-white shadow-modal">
-      <CheckCircle2 className="size-4 text-emerald-400" />
+    <div
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl px-5 py-3.5 text-[13.5px] font-semibold shadow-[0_20px_60px_rgba(7,27,73,0.18)]"
+      style={{ background: tone === 'green' ? C.green : C.blue, color: C.white }}
+    >
+      <CheckCircle2 className="size-4" />
       {message}
     </div>
   )
 }
 
-// ── Academic Master ───────────────────────────────────────────────────────────
-const masterCards = [
-  { key: 'Department', plural: 'Departments', total: '6 Departments', examples: 'CSE, ME, ECE, IT, AE', icon: BookOpen, tone: 'violet' },
-  { key: 'Subject', plural: 'Subjects', total: '156 Subjects', examples: 'Data Structures (CS301), Digital Logic (CS302), …', icon: FileSpreadsheet, tone: 'green' },
-  { key: 'Section', plural: 'Sections', total: '24 Sections', examples: 'CSE 3A, CSE 3B, ECE 3A, …', icon: Users, tone: 'orange' },
-  { key: 'Room', plural: 'Rooms', total: '45 Rooms', examples: '201, 203, 204, 301, 302, …', icon: Laptop, tone: 'blue' },
+function Notice({ children, tone = 'blue' }: { children: React.ReactNode; tone?: 'blue' | 'orange' | 'green' }) {
+  const s = tone === 'blue'   ? { bg: C.blueLight,   border: '#BFDBFE', text: C.textSecondary } :
+            tone === 'orange' ? { bg: C.orangeLight,  border: '#FED7AA', text: '#92400E' } :
+                               { bg: C.greenLight,   border: '#BBF7D0', text: '#14532D' }
+  return (
+    <div className="flex items-start gap-3 rounded-xl p-4 text-[13px]" style={{ background: s.bg, border: `1px solid ${s.border}`, color: s.text }}>
+      <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
+      <div>{children}</div>
+    </div>
+  )
+}
+
+// ─── Academic Master ──────────────────────────────────────────────────────────
+const masterNav = [
+  { key: 'departments', label: 'Departments', icon: BookOpen   },
+  { key: 'subjects',    label: 'Subjects',    icon: FileSpreadsheet },
+  { key: 'sections',    label: 'Sections',    icon: Users      },
+  { key: 'rooms',       label: 'Rooms',       icon: Monitor    },
+]
+
+const departments = [
+  { code: 'CSE', name: 'Computer Science & Engineering', hod: 'Dr. Ramesh Kumar',   subjects: 24, status: 'Active' },
+  { code: 'ECE', name: 'Electronics & Communication',    hod: 'Dr. Anita Sharma',   subjects: 22, status: 'Active' },
+  { code: 'ME',  name: 'Mechanical Engineering',         hod: 'Dr. Suresh Rao',     subjects: 18, status: 'Active' },
+  { code: 'CE',  name: 'Civil Engineering',              hod: 'Dr. Priya Nair',     subjects: 16, status: 'Active' },
+  { code: 'IT',  name: 'Information Technology',         hod: 'Dr. Neha Joshi',     subjects: 20, status: 'Active' },
+  { code: 'AE',  name: 'Artificial Intelligence',        hod: 'Dr. Rajesh Mehta',   subjects: 14, status: 'Active' },
 ]
 
 export function AcademicMasterPage() {
-  const [modal, setModal] = useState<{ type: string; mode: 'Add' | 'Edit' } | null>(null)
-  const [saved, setSaved] = useState(false)
-  const [value, setValue] = useState('CSE')
-  const card = modal && masterCards.find(c => c.key === modal.type)
+  const [activeNav, setActiveNav] = useState('departments')
+  const [modal, setModal]         = useState<'add' | 'edit' | null>(null)
+  const [toast, setToast]         = useState(false)
+  const [editRow, setEditRow]     = useState(departments[0])
 
   return (
     <AdminShell>
       <AdminContent>
-        <PageHeader title="Academic Master" description="Manage departments, subjects, sections and rooms." />
+        <PageHeader
+          title="Academic Master"
+          description="Manage departments, subjects, sections and rooms."
+        />
 
-        <div className="grid gap-5 lg:grid-cols-2">
-          {masterCards.map(item => {
-            const Icon = item.icon
-            const tone =
-              item.tone === 'violet' ? 'bg-violet-50 text-violet-700' :
-              item.tone === 'green'  ? 'bg-emerald-50 text-emerald-700' :
-              item.tone === 'orange' ? 'bg-orange-50 text-orange-700' :
-              'bg-[#EAF3FF] text-[#1565D8]'
-            return (
-              <Panel key={item.key} className="p-5">
-                <div className="flex items-center gap-3">
-                  <div className={`flex size-11 items-center justify-center rounded-xl ${tone}`}>
-                    <Icon className="size-5" />
-                  </div>
-                  <div>
-                    <h2 className="font-700 text-[#0B1F3A]">{item.plural}</h2>
-                    <p className="mt-0.5 text-sm text-[#64748B]">
-                      Total: <span className="font-600 text-[#374151]">{item.total}</span>
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-4 min-h-10 text-sm text-[#374151]">{item.examples}</p>
-                <div className="mt-5 flex gap-2">
+        <div className="flex gap-6">
+          {/* Left sidebar nav */}
+          <div
+            className="w-52 shrink-0 rounded-xl bg-white self-start"
+            style={{ border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(7,27,73,0.05)' }}
+          >
+            <div className="p-3 space-y-0.5">
+              {masterNav.map(item => {
+                const active = activeNav === item.key
+                const Icon = item.icon
+                return (
                   <button
-                    onClick={() => {
-                      setValue(item.key === 'Subject' ? 'CS301' : item.key === 'Room' ? '201' : 'CSE')
-                      setModal({ type: item.key, mode: 'Add' })
+                    key={item.key}
+                    onClick={() => setActiveNav(item.key)}
+                    className="w-full flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13.5px] transition-colors text-left"
+                    style={{
+                      background: active ? C.blueLight : 'transparent',
+                      color:      active ? C.blue      : C.textSecondary,
+                      fontWeight: active ? 600 : 400,
                     }}
-                    className={secondaryButton}
                   >
-                    <Plus className="size-4" /> Add
+                    <Icon className="size-4 shrink-0" style={{ color: active ? C.blue : C.textTertiary }} />
+                    {item.label}
                   </button>
-                  <button
-                    onClick={() => {
-                      setValue(item.key === 'Subject' ? 'CS301' : item.key === 'Room' ? '201' : 'CSE')
-                      setModal({ type: item.key, mode: 'Edit' })
-                    }}
-                    className={secondaryButton}
-                  >
-                    <Edit3 className="size-4" /> Edit
-                  </button>
-                </div>
-              </Panel>
-            )
-          })}
-        </div>
+                )
+              })}
+            </div>
+          </div>
 
-        <div className="mt-6">
-          <Notice>
-            These master records are used across timetable creation, faculty assignments and student profiles.
-          </Notice>
+          {/* Right content */}
+          <div className="flex-1 min-w-0">
+            <Panel>
+              <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+                <div>
+                  <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Departments</h2>
+                  <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>
+                    Total: <span className="font-semibold" style={{ color: C.navy }}>6 Departments</span>
+                  </p>
+                </div>
+                <button onClick={() => setModal('add')} className={primaryButton}>
+                  <Plus className="size-4" /> Add Department
+                </button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[700px] text-left">
+                  <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                    <tr>
+                      {['#','Dept. Code','Department Name','HOD','Total Subjects','Status','Actions'].map((h, i) => (
+                        <th
+                          key={h}
+                          className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
+                          style={{ color: C.textSecondary, textAlign: i === 6 ? 'right' : 'left' }}
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {departments.map((dept, i) => (
+                      <tr
+                        key={dept.code}
+                        style={{ borderBottom: `1px solid ${C.border}` }}
+                        onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
+                        onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                      >
+                        <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                        <td className="px-5 py-[14px]">
+                          <span
+                            className="rounded-lg px-2.5 py-1 text-[12px] font-bold"
+                            style={{ background: C.blueLight, color: C.blue }}
+                          >
+                            {dept.code}
+                          </span>
+                        </td>
+                        <td className="px-5 py-[14px] text-[13.5px] font-medium" style={{ color: C.navy }}>{dept.name}</td>
+                        <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{dept.hod}</td>
+                        <td className="px-5 py-[14px] text-[13px] font-medium" style={{ color: C.navy }}>{dept.subjects}</td>
+                        <td className="px-5 py-[14px]"><StatusBadge tone="green">{dept.status}</StatusBadge></td>
+                        <td className="px-5 py-[14px] text-right">
+                          <button
+                            onClick={() => { setEditRow(dept); setModal('edit') }}
+                            className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium transition-colors hover:bg-[#EAF3FF]"
+                            style={{ borderColor: C.border, color: C.blue }}
+                          >
+                            <Edit3 className="size-3.5" /> Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+          </div>
         </div>
       </AdminContent>
 
-      {modal && card && (
-        <Modal title={`${modal.mode} ${card.key}`} onClose={() => setModal(null)}>
+      {modal && (
+        <Modal
+          title={modal === 'add' ? 'Add Department' : `Edit — ${editRow.code}`}
+          subtitle={modal === 'edit' ? editRow.name : undefined}
+          onClose={() => setModal(null)}
+        >
           <div className="space-y-4">
-            {modal.type === 'Section' ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Section Name" value={value} onChange={setValue} />
-                <Field label="Department" value="CSE" options={['CSE', 'ECE', 'IT', 'ME']} />
-                <Field label="Year" value="3rd Year" options={['1st Year', '2nd Year', '3rd Year', '4th Year']} />
-                <Field label="Semester" value="5" options={['1', '2', '3', '4', '5', '6', '7', '8']} />
-              </div>
-            ) : (
-              <Field
-                label={`${card.key} ${card.key === 'Room' ? 'Number' : 'Code'}`}
-                value={value}
-                onChange={setValue}
-              />
-            )}
+            <Field label="Department Code"  value={modal === 'edit' ? editRow.code : ''}  onChange={() => {}} required />
+            <Field label="Department Name"  value={modal === 'edit' ? editRow.name : ''}  onChange={() => {}} required />
+            <Field label="Head of Department (HOD)" value={modal === 'edit' ? editRow.hod : ''} onChange={() => {}} required />
             <div className="flex justify-end gap-2 pt-2">
               <button onClick={() => setModal(null)} className={secondaryButton}>Cancel</button>
-              <button
-                onClick={() => { setModal(null); setSaved(true) }}
-                className={primaryButton}
-              >
+              <button onClick={() => { setModal(null); setToast(true) }} className={primaryButton}>
                 <Save className="size-4" /> Save Changes
               </button>
             </div>
           </div>
         </Modal>
       )}
-      {saved && <Toast message="Changes saved successfully." />}
+      {toast && <Toast message="Changes saved successfully." />}
     </AdminShell>
   )
 }
 
-// ── Timetable Management ──────────────────────────────────────────────────────
+// ─── Timetable Management ─────────────────────────────────────────────────────
 const timetableRows = [
-  { id: 1, time: '10:00 AM – 11:00 AM', subject: 'Data Structures', code: 'CS301 · Theory', faculty: 'Prof. Rohit Sharma', room: '201' },
-  { id: 2, time: '11:15 AM – 12:15 PM', subject: 'Digital Logic', code: 'CS302 · Theory', faculty: 'Prof. Neha Joshi', room: '203' },
-  { id: 3, time: '02:00 PM – 03:00 PM', subject: 'Mathematics', code: 'MA303 · Theory', faculty: 'Prof. Amit Verma', room: '205' },
-  { id: 4, time: '03:15 PM – 04:15 PM', subject: 'Operating Systems', code: 'CS304 · Lab', faculty: 'Prof. Pooja Singh', room: 'Lab 2' },
+  { id: 1, time: '10:00 AM – 11:00 AM', subject: 'Data Structures',  code: 'CS301', type: 'Theory', faculty: 'Prof. Rohit Sharma', room: '201' },
+  { id: 2, time: '11:15 AM – 12:15 PM', subject: 'Digital Logic',    code: 'CS302', type: 'Theory', faculty: 'Prof. Neha Joshi',   room: '203' },
+  { id: 3, time: '02:00 PM – 03:00 PM', subject: 'Mathematics',      code: 'MA303', type: 'Theory', faculty: 'Prof. Amit Verma',   room: '205' },
+  { id: 4, time: '03:15 PM – 04:15 PM', subject: 'Operating Systems',code: 'CS304', type: 'Lab',    faculty: 'Prof. Pooja Singh',  room: 'Lab 2' },
 ]
-const filters = {
-  department: ['CSE', 'ECE', 'IT'],
-  year: ['3rd Year', '2nd Year'],
-  semester: ['5', '4'],
-  section: ['CSE 3A', 'CSE 3B'],
-  day: ['Monday', 'Tuesday', 'Wednesday'],
-}
 
 export function TimetablePage() {
   const [selected, setSelected] = useState<number[]>([])
-  const [editing, setEditing] = useState<typeof timetableRows[0] | null>(null)
-  const [notice, setNotice] = useState(false)
-  const [loading] = useState(false)
-  const [error, setError] = useState(false)
-  const toggle = (id: number) =>
+  const [editing, setEditing]   = useState<typeof timetableRows[0] | null>(null)
+  const [toast, setToast]       = useState(false)
+
+  const toggleRow = (id: number) =>
     setSelected(cur => cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id])
 
   return (
@@ -237,7 +274,7 @@ export function TimetablePage() {
       <AdminContent>
         <PageHeader
           title="Timetable Management"
-          description="Review, edit and publish academic timetable records."
+          description="Create, view, edit and manage class timetable records."
           actions={
             <>
               <Link href="/admin/timetable/import" className={secondaryButton}>
@@ -250,145 +287,162 @@ export function TimetablePage() {
           }
         />
 
-        {/* Filters */}
-        <Panel className="mb-5">
-          <div className="grid gap-3 p-5 md:grid-cols-5">
-            {Object.entries(filters).map(([label, options]) => (
-              <Field
-                key={label}
-                label={label[0].toUpperCase() + label.slice(1)}
-                value={options[0]}
-                options={options}
-                required={false}
-              />
-            ))}
-          </div>
-        </Panel>
+        {/* Filter row */}
+        <div className="mb-5 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {[
+            { label: 'Department', opts: ['CSE','ECE','IT'] },
+            { label: 'Year',       opts: ['3rd Year','2nd Year'] },
+            { label: 'Semester',   opts: ['5','4','3'] },
+            { label: 'Section',    opts: ['CSE 3A','CSE 3B'] },
+            { label: 'Day',        opts: ['Monday','Tuesday','Wednesday','Thursday','Friday'] },
+          ].map(f => (
+            <Field key={f.label} label={f.label} value={f.opts[0]} options={f.opts} required={false} />
+          ))}
+        </div>
 
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <StatusBadge tone="orange">Draft</StatusBadge>
-            <span className="text-xs text-[#64748B]">Last Updated: 20 May 2024, 10:30 AM</span>
+            <span className="text-[12.5px]" style={{ color: C.textTertiary }}>
+              Last Updated: 20 May 2024, 10:30 AM
+            </span>
           </div>
           <button
             disabled={!selected.length}
             className={`${secondaryButton} disabled:cursor-not-allowed disabled:opacity-50`}
           >
-            Edit Selected
+            Edit Selected ({selected.length})
           </button>
         </div>
 
-        {loading ? (
-          <Panel className="p-6 space-y-3">
-            {[1,2,3].map(n => <div key={n} className="h-12 animate-pulse rounded-lg bg-slate-100" />)}
-          </Panel>
-        ) : error ? (
-          <Panel className="p-10 text-center">
-            <AlertTriangle className="mx-auto size-8 text-[#C24141]" />
-            <p className="mt-3 font-600 text-[#0B1F3A]">Unable to load timetable data.</p>
-            <button onClick={() => setError(false)} className={`${secondaryButton} mt-4`}>
-              Try Again
-            </button>
-          </Panel>
-        ) : (
-          <Panel>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px] text-left text-sm">
-                <thead className="border-y border-[#D9E0E8] bg-[#F7F9FC] text-[11px] font-700 uppercase tracking-wider text-[#64748B]">
-                  <tr>
-                    <th className="w-12 px-5 py-3" />
-                    <th className="px-5 py-3">Time</th>
-                    <th className="px-5 py-3">Subject</th>
-                    <th className="px-5 py-3">Faculty</th>
-                    <th className="px-5 py-3">Room</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#F1F5F9]">
-                  {timetableRows.map(row => (
-                    <tr key={row.id} className="hover:bg-[#F7F9FC] transition-colors">
-                      <td className="px-5 py-4">
-                        <input
-                          type="checkbox"
-                          checked={selected.includes(row.id)}
-                          onChange={() => toggle(row.id)}
-                          className="size-4 accent-[#1565D8]"
-                        />
-                      </td>
-                      <td className="px-5 py-4 text-[13px] font-600 text-[#374151] whitespace-nowrap">
-                        {row.time}
-                      </td>
-                      <td className="px-5 py-4">
-                        <p className="font-600 text-[#0B1F3A]">{row.subject}</p>
-                        <p className="mt-0.5 text-xs text-[#64748B]">{row.code}</p>
-                      </td>
-                      <td className="px-5 py-4 text-[13px] text-[#374151]">{row.faculty}</td>
-                      <td className="px-5 py-4 text-[13px] text-[#374151]">Room {row.room}</td>
-                      <td className="px-5 py-4 text-right">
-                        <button
-                          onClick={() => setEditing(row)}
-                          className={`${secondaryButton} h-9 px-3 text-xs`}
-                        >
-                          <Edit3 className="size-3.5" /> Edit
-                        </button>
-                      </td>
-                    </tr>
+        <Panel>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[800px] text-left">
+              <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                <tr>
+                  <th className="w-12 px-5 py-3" />
+                  {['#','Time Slot','Subject','Faculty','Room','Actions'].map((h, i) => (
+                    <th
+                      key={h}
+                      className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
+                      style={{ color: C.textSecondary, textAlign: i === 5 ? 'right' : 'left' }}
+                    >
+                      {h}
+                    </th>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </Panel>
-        )}
+                </tr>
+              </thead>
+              <tbody>
+                {timetableRows.map((row, i) => (
+                  <tr
+                    key={row.id}
+                    style={{ borderBottom: `1px solid ${C.border}` }}
+                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
+                    onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = selected.includes(row.id) ? C.blueLight + '40' : 'transparent'}
+                  >
+                    <td className="px-5 py-[14px]">
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(row.id)}
+                        onChange={() => toggleRow(row.id)}
+                        className="size-4 rounded"
+                        style={{ accentColor: C.blue }}
+                      />
+                    </td>
+                    <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                    <td className="px-5 py-[14px]">
+                      <p className="text-[13.5px] font-semibold whitespace-nowrap" style={{ color: C.navy }}>{row.time}</p>
+                    </td>
+                    <td className="px-5 py-[14px]">
+                      <p className="text-[13.5px] font-medium" style={{ color: C.navy }}>{row.subject}</p>
+                      <p className="mt-0.5 text-[12px]" style={{ color: C.textTertiary }}>
+                        {row.code} · {row.type}
+                      </p>
+                    </td>
+                    <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{row.faculty}</td>
+                    <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>Room {row.room}</td>
+                    <td className="px-5 py-[14px] text-right">
+                      <button
+                        onClick={() => setEditing(row)}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium transition-colors hover:bg-[#EAF3FF]"
+                        style={{ borderColor: C.border, color: C.blue }}
+                      >
+                        <Edit3 className="size-3.5" /> Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        <div className="mt-5">
-          <Notice>Changes to timetable records are logged for audit purposes.</Notice>
-        </div>
+          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderTop: `1px solid ${C.border}` }}>
+            <p className="text-[13px]" style={{ color: C.textTertiary }}>Showing 4 of 48 entries</p>
+            <div className="flex gap-1">
+              {[1, 2, 3, '…', 6].map((p, i) => (
+                <button
+                  key={i}
+                  className="flex size-8 items-center justify-center rounded-lg text-[13px] font-medium"
+                  style={p === 1 ? { background: C.blue, color: C.white } : { color: C.textSecondary }}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+        </Panel>
       </AdminContent>
 
       {editing && (
         <Modal title="Edit Timetable Entry" onClose={() => setEditing(null)}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Department" value="CSE" options={['CSE', 'ECE', 'IT']} />
-            <Field label="Year" value="3rd Year" options={['2nd Year', '3rd Year']} />
-            <Field label="Semester" value="5" options={['4', '5']} />
-            <Field label="Section" value="CSE 3A" options={['CSE 3A', 'CSE 3B']} />
-            <Field label="Subject" value={editing.subject} />
-            <Field label="Faculty" value={editing.faculty} />
-            <Field label="Room" value={editing.room} />
-            <Field label="Day" value="Monday" options={['Monday', 'Tuesday']} />
-            <Field label="Start Time" value="10:00 AM" />
-            <Field label="End Time" value="11:00 AM" />
-            <Field label="Class Type" value="Theory" options={['Theory', 'Lab']} />
+            {[
+              { label: 'Department', opts: ['CSE','ECE','IT'] },
+              { label: 'Year',       opts: ['3rd Year','2nd Year'] },
+              { label: 'Semester',   opts: ['5','4'] },
+              { label: 'Section',    opts: ['CSE 3A','CSE 3B'] },
+            ].map(f => <Field key={f.label} label={f.label} value={f.opts[0]} options={f.opts} />)}
+            <Field label="Subject"    value={editing.subject} onChange={() => {}} />
+            <Field label="Subject Code" value={editing.code} onChange={() => {}} />
+            <Field label="Faculty"    value={editing.faculty} onChange={() => {}} />
+            <Field label="Room"       value={editing.room}   onChange={() => {}} />
+            <Field label="Day"        value="Monday"         options={['Monday','Tuesday','Wednesday','Thursday','Friday']} />
+            <Field label="Start Time" value="10:00 AM"       onChange={() => {}} />
+            <Field label="End Time"   value="11:00 AM"       onChange={() => {}} />
+            <Field label="Class Type" value={editing.type}   options={['Theory','Lab']} />
           </div>
           <div className="mt-5 flex justify-end gap-2">
             <button onClick={() => setEditing(null)} className={secondaryButton}>Cancel</button>
-            <button
-              onClick={() => { setEditing(null); setNotice(true) }}
-              className={primaryButton}
-            >
+            <button onClick={() => { setEditing(null); setToast(true) }} className={primaryButton}>
               Save Changes
             </button>
           </div>
         </Modal>
       )}
-      {notice && <Toast message="Timetable entry updated successfully." />}
+      {toast && <Toast message="Timetable entry updated." />}
     </AdminShell>
   )
 }
 
-// ── Timetable Import ──────────────────────────────────────────────────────────
+// ─── Timetable Import ─────────────────────────────────────────────────────────
+const recentImports = [
+  { file: 'timetable_sem5_2026.xlsx', date: '20 May 2024, 10:30 AM', records: 248, status: 'Success' },
+  { file: 'timetable_sem4_2026.csv',  date: '15 May 2024, 03:15 PM', records: 192, status: 'Success' },
+  { file: 'timetable_sem3_2026.xlsx', date: '10 May 2024, 09:00 AM', records: 0,   status: 'Failed'  },
+]
+
 export function TimetableImportPage() {
-  const [file, setFile] = useState('timetable_2026_27.xlsx')
-  const [preview, setPreview] = useState(false)
-  const [downloaded, setDownloaded] = useState(false)
+  const [file, setFile]         = useState<string | null>(null)
+  const [preview, setPreview]   = useState(false)
   const [imported, setImported] = useState(false)
+  const [dragging, setDragging] = useState(false)
 
   return (
     <AdminShell>
       <AdminContent>
         <PageHeader
-          title="Timetable Import"
-          description="Upload Excel / CSV timetable data for review before publishing."
+          title="Import Timetable"
+          description="Upload timetable data using an Excel or CSV file."
           actions={
             <Link href="/admin/timetable" className={secondaryButton}>
               <ArrowLeft className="size-4" /> Back
@@ -396,277 +450,380 @@ export function TimetableImportPage() {
           }
         />
 
-        <Panel>
-          <div className="border-b border-violet-100 bg-violet-50 px-5 py-4">
-            <h2 className="font-700 text-violet-900">Import Timetable Excel / CSV (Bulk)</h2>
-            <p className="mt-1 text-xs text-violet-700">
-              Upload a prepared timetable file and review each record before it becomes active.
-            </p>
-          </div>
-          <div className="p-5">
-            <div className="flex flex-wrap items-center gap-4 rounded-xl border border-dashed border-violet-200 bg-violet-50/40 p-5">
-              <FileSpreadsheet className="size-7 text-violet-600 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-600 text-[#0B1F3A]">{file}</p>
-                <p className="mt-0.5 text-xs text-[#64748B]">1,248 records selected</p>
-              </div>
-              <span className="flex items-center gap-1.5 text-sm font-700 text-emerald-700">
-                <CheckCircle2 className="size-4" /> Valid file
-              </span>
-              <label className={secondaryButton}>
-                Choose another
-                <input
-                  type="file"
-                  accept=".xlsx,.csv"
-                  className="sr-only"
-                  onChange={e => setFile(e.target.files?.[0]?.name || file)}
-                />
-              </label>
-              <button onClick={() => setPreview(true)} className={primaryButton}>
-                Review Timetable Data
-              </button>
-            </div>
-
-            <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_280px]">
-              <div>
-                <h3 className="font-700 text-[#0B1F3A]">Expected Columns</h3>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {['Department', 'Year', 'Semester', 'Section', 'Subject', 'Faculty', 'Room', 'Date / Day', 'Start Time', 'End Time', 'Class Type'].map(item => (
-                    <div key={item} className="flex items-center gap-2 rounded-lg bg-slate-50 border border-[#D9E0E8] px-3 py-2 text-sm text-[#374151]">
-                      <FileSpreadsheet className="size-4 text-[#64748B] shrink-0" />
-                      {item}
-                    </div>
-                  ))}
+        <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          {/* Upload area */}
+          <div className="space-y-5">
+            {/* Dropzone */}
+            <Panel>
+              <div
+                className="m-5 flex flex-col items-center justify-center rounded-xl p-10 text-center transition-all"
+                style={{
+                  border: `2px dashed ${dragging ? C.blue : C.border}`,
+                  background: dragging ? C.blueLight : C.blueFaint,
+                }}
+                onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={e => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f) setFile(f.name) }}
+              >
+                <div
+                  className="flex size-14 items-center justify-center rounded-2xl mb-4"
+                  style={{ background: C.blueLight }}
+                >
+                  <CloudUpload className="size-7" style={{ color: C.blue }} />
                 </div>
+                <p className="text-[15px] font-semibold" style={{ color: C.navy }}>
+                  {file ? file : 'Drag & drop your file here'}
+                </p>
+                <p className="mt-1.5 text-[13px]" style={{ color: C.textTertiary }}>
+                  {file ? `File ready to import` : 'or click to browse'}
+                </p>
+                <p className="mt-3 text-[12px]" style={{ color: C.textTertiary }}>
+                  Supported formats: .xlsx, .xls, .csv · Max size: 10 MB
+                </p>
+                <label className={`${primaryButton} mt-5 cursor-pointer`}>
+                  <Upload className="size-4" />
+                  {file ? 'Change File' : 'Choose File'}
+                  <input type="file" accept=".xlsx,.xls,.csv" className="sr-only"
+                    onChange={e => setFile(e.target.files?.[0]?.name || null)} />
+                </label>
               </div>
-              <div className="flex flex-col justify-end gap-3">
-                <button onClick={() => setDownloaded(true)} className={secondaryButton}>
-                  <FileSpreadsheet className="size-4" /> Download Template
-                </button>
-                <Notice tone="orange">
-                  <span className="font-600">Imported timetable data will be reviewed for accuracy before publishing.</span>
-                </Notice>
-              </div>
-            </div>
-          </div>
-        </Panel>
 
-        {preview && (
-          <Panel title="Timetable Preview" description="Review sample rows before importing." className="mt-5">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="border-y border-[#D9E0E8] bg-[#F7F9FC] text-[11px] font-700 uppercase tracking-wider text-[#64748B]">
-                  <tr>
-                    {['Department','Year','Semester','Section','Subject','Faculty','Room','Date / Day','Time','Class Type'].map(h => (
-                      <th key={h} className="px-4 py-3">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#F1F5F9]">
-                  {[
-                    ['CSE','3rd Year','5','CSE 3A','Data Structures','Prof. Rohit Sharma','201','Monday','10:00–11:00 AM','Theory'],
-                    ['CSE','3rd Year','5','CSE 3A','Digital Logic','Prof. Neha Joshi','203','Monday','11:15–12:15 PM','Theory'],
-                  ].map(row => (
-                    <tr key={row[4]} className="hover:bg-[#F7F9FC]">
-                      {row.map(cell => (
-                        <td key={cell} className="whitespace-nowrap px-4 py-3 text-[13px] text-[#374151]">{cell}</td>
+              {file && (
+                <div className="mx-5 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl p-4" style={{ background: C.greenLight, border: `1px solid #BBF7D0` }}>
+                  <div className="flex items-center gap-2.5">
+                    <FileSpreadsheet className="size-4 shrink-0" style={{ color: C.green }} />
+                    <span className="text-[13.5px] font-semibold" style={{ color: '#14532D' }}>{file}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setPreview(true)} className={secondaryButton}>Preview Data</button>
+                    <button onClick={() => setImported(true)} className={primaryButton}>Import as Draft</button>
+                  </div>
+                </div>
+              )}
+            </Panel>
+
+            {/* Preview table */}
+            {preview && (
+              <Panel title="Data Preview" description="Sample rows from your uploaded file.">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[900px] text-left">
+                    <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                      <tr>
+                        {['Dept','Year','Sem','Section','Subject','Faculty','Room','Day','Time','Type'].map(h => (
+                          <th key={h} className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.textSecondary }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        ['CSE','3rd','5','CSE 3A','Data Structures','Prof. Rohit Sharma','201','Monday','10:00–11:00','Theory'],
+                        ['CSE','3rd','5','CSE 3A','Digital Logic',   'Prof. Neha Joshi',  '203','Monday','11:15–12:15','Theory'],
+                      ].map(row => (
+                        <tr key={row[4]} style={{ borderBottom: `1px solid ${C.border}` }}>
+                          {row.map((cell, i) => (
+                            <td key={i} className="px-4 py-[12px] text-[13px] whitespace-nowrap" style={{ color: C.textSecondary }}>{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Panel>
+            )}
+
+            {imported && <Notice tone="green">Timetable imported as Draft. Go to Timetable Management to review before publishing.</Notice>}
+
+            {/* Recent imports */}
+            <Panel title="Recent Imports">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px]">
+                  <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                    <tr>
+                      {['#','File Name','Imported On','Records','Status','Actions'].map(h => (
+                        <th key={h} className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.textSecondary }}>{h}</th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#D9E0E8] p-5">
-              <StatusBadge tone="orange">Pending Review</StatusBadge>
-              <button onClick={() => setImported(true)} className={primaryButton}>
-                Import as Draft
-              </button>
-            </div>
-          </Panel>
-        )}
+                  </thead>
+                  <tbody>
+                    {recentImports.map((r, i) => (
+                      <tr key={r.file} style={{ borderBottom: `1px solid ${C.border}` }}>
+                        <td className="px-5 py-[13px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                        <td className="px-5 py-[13px] text-[13px] font-medium" style={{ color: C.navy }}>{r.file}</td>
+                        <td className="px-5 py-[13px] text-[13px]" style={{ color: C.textSecondary }}>{r.date}</td>
+                        <td className="px-5 py-[13px] text-[13px] font-semibold" style={{ color: C.navy }}>{r.records}</td>
+                        <td className="px-5 py-[13px]">
+                          <StatusBadge tone={r.status === 'Success' ? 'green' : 'red'}>{r.status}</StatusBadge>
+                        </td>
+                        <td className="px-5 py-[13px]">
+                          <button className="text-[12.5px] font-medium transition-colors hover:underline" style={{ color: C.blue }}>View</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+          </div>
 
-        {imported && (
-          <div className="mt-5">
-            <Notice tone="green">
-              <span className="font-600">Timetable data imported successfully.</span>{' '}
-              Status: <StatusBadge tone="orange">Pending Review</StatusBadge>
+          {/* Right guidelines */}
+          <div className="space-y-4">
+            <Panel title="Import Guidelines">
+              <div className="p-5 space-y-3">
+                {[
+                  'Use the provided template format',
+                  'Ensure correct column names',
+                  'Required: Department, Year, Semester, Section, Day, Time, Subject, Faculty, Room',
+                  'Check for duplicate entries before importing',
+                  'Review data before publishing',
+                ].map((tip, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <div
+                      className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full"
+                      style={{ background: C.blueLight }}
+                    >
+                      <Check className="size-3" style={{ color: C.blue }} />
+                    </div>
+                    <p className="text-[13px]" style={{ color: C.textSecondary }}>{tip}</p>
+                  </div>
+                ))}
+                <button className={`${secondaryButton} w-full mt-2`}>
+                  <FileSpreadsheet className="size-4" /> Download Template
+                </button>
+              </div>
+            </Panel>
+
+            <Notice>
+              Imported data will remain as Draft until reviewed and published by an admin.
             </Notice>
           </div>
-        )}
-
-        <div className="mt-4 text-right text-xs text-[#64748B]">
-          {downloaded ? 'Timetable template downloaded.' : 'Accepted formats: .xlsx, .csv'}
         </div>
       </AdminContent>
     </AdminShell>
   )
 }
 
-// ── Bulk Academic Update ──────────────────────────────────────────────────────
-const bulkStudents: [string, string][] = [
-  ['01CS123', 'Rahul Sharma'], ['01CS124', 'Ananya Singh'], ['01CS125', 'Vikram Patel'],
-  ['01CS190', 'Neha Verma'], ['01CS191', 'Arjun Kumar'], ['01CS192', 'Ishita Rao'],
-  ['01CS193', 'Karan Shah'],
+// ─── Bulk Academic Update ─────────────────────────────────────────────────────
+const bulkStudents = [
+  { usn: '01CS123', name: 'Rahul Sharma',  info: 'CSE 1A · Sem 2' },
+  { usn: '01CS124', name: 'Ananya Singh',  info: 'CSE 1A · Sem 2' },
+  { usn: '01CS125', name: 'Vikram Patel',  info: 'CSE 1A · Sem 2' },
+  { usn: '01CS190', name: 'Neha Verma',    info: 'CSE 1A · Sem 2' },
+  { usn: '01CS191', name: 'Arjun Kumar',   info: 'CSE 1A · Sem 2' },
+  { usn: '01CS192', name: 'Ishita Rao',    info: 'CSE 1A · Sem 2' },
+  { usn: '01CS193', name: 'Karan Shah',    info: 'CSE 1A · Sem 2' },
+]
+
+const steps = [
+  { n: 1, label: 'Select Students' },
+  { n: 2, label: 'Choose Updates'  },
+  { n: 3, label: 'Preview & Confirm' },
 ]
 
 export function BulkAcademicUpdatePage() {
-  const [checked, setChecked] = useState(bulkStudents.map(s => s[0]))
-  const [confirm, setConfirm] = useState(false)
-  const [preview, setPreview] = useState(false)
-  const [done, setDone] = useState(false)
-  const toggle = (id: string) =>
-    setChecked(cur => cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id])
+  const [checked,  setChecked]  = useState(bulkStudents.map(s => s.usn))
+  const [step,     setStep]     = useState(1)
+  const [confirm,  setConfirm]  = useState(false)
+  const [done,     setDone]     = useState(false)
+  const [newYear,  setNewYear]  = useState('2nd Year')
+  const [newSem,   setNewSem]   = useState('3')
+  const [newSec,   setNewSec]   = useState('CSE 3A')
+
+  const toggle = (usn: string) =>
+    setChecked(cur => cur.includes(usn) ? cur.filter(x => x !== usn) : [...cur, usn])
 
   return (
     <AdminShell>
       <AdminContent>
         <PageHeader
           title="Bulk Academic Update"
-          description="Update academic information for multiple selected students at once."
+          description="Update year, semester or section for multiple students at once."
         />
 
-        <Panel title="Filter Current Students">
-          <div className="grid gap-4 p-5 md:grid-cols-4">
-            <Field label="Current Department" value="CSE" options={['CSE', 'ECE', 'IT']} />
-            <Field label="Current Year" value="1st Year" options={['1st Year', '2nd Year', '3rd Year']} />
-            <Field label="Current Semester" value="2" options={['1', '2', '3', '4']} />
-            <Field label="Current Section" value="CSE 3A" options={['CSE 3A', 'CSE 3B']} />
-          </div>
-        </Panel>
-
-        <Panel className="mt-5">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D9E0E8] px-5 py-4">
-            <div>
-              <h2 className="font-700 text-[#0B1F3A]">Student Selection</h2>
-              <p className="mt-0.5 text-sm text-emerald-700 font-600">
-                {checked.length === bulkStudents.length ? 68 : checked.length} Students Selected
-              </p>
+        {/* Step indicator */}
+        <div className="mb-7 flex items-center gap-0">
+          {steps.map((s, i) => (
+            <div key={s.n} className="flex items-center">
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="flex size-8 items-center justify-center rounded-full text-[13px] font-bold border-2 transition-all"
+                  style={
+                    step === s.n
+                      ? { background: C.blue, borderColor: C.blue, color: C.white }
+                      : step > s.n
+                      ? { background: C.green, borderColor: C.green, color: C.white }
+                      : { background: C.white, borderColor: C.border, color: C.textTertiary }
+                  }
+                >
+                  {step > s.n ? <Check className="size-3.5" /> : s.n}
+                </div>
+                <span
+                  className="text-[13px] font-medium"
+                  style={{ color: step === s.n ? C.navy : C.textTertiary }}
+                >
+                  {s.label}
+                </span>
+              </div>
+              {i < steps.length - 1 && (
+                <div className="mx-4 h-px w-16 flex-1" style={{ background: step > s.n ? C.green : C.border }} />
+              )}
             </div>
-            <button
-              onClick={() => setChecked(checked.length ? [] : bulkStudents.map(s => s[0]))}
-              className={secondaryButton}
-            >
-              {checked.length ? 'Deselect All' : 'Select All'}
-            </button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[680px] text-left text-sm">
-              <thead className="border-y border-[#D9E0E8] bg-[#F7F9FC] text-[11px] font-700 uppercase tracking-wider text-[#64748B]">
-                <tr>
-                  <th className="w-12 px-5 py-3" />
-                  <th className="px-5 py-3">USN</th>
-                  <th className="px-5 py-3">Student Name</th>
-                  <th className="px-5 py-3">Current Academic Info</th>
-                  <th className="px-5 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#F1F5F9]">
-                {bulkStudents.map(([id, name]) => (
-                  <tr key={id} className={`transition-colors ${checked.includes(id) ? 'bg-[#EAF3FF]/40' : 'hover:bg-[#F7F9FC]'}`}>
-                    <td className="px-5 py-3">
-                      <input
-                        type="checkbox"
-                        checked={checked.includes(id)}
-                        onChange={() => toggle(id)}
-                        className="size-4 accent-[#1565D8]"
-                      />
-                    </td>
-                    <td className="px-5 py-3 text-[13px] font-600 text-[#0B1F3A]">{id}</td>
-                    <td className="px-5 py-3 text-[13px] text-[#374151]">{name}</td>
-                    <td className="px-5 py-3 text-[13px] text-[#64748B]">CSE 1A · Sem 2</td>
-                    <td className="px-5 py-3">
-                      <StatusBadge tone={checked.includes(id) ? 'blue' : 'navy'}>
-                        {checked.includes(id) ? 'Selected' : 'Not Selected'}
-                      </StatusBadge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Panel>
-
-        <Panel title="New Academic Details (To be Applied)" className="mt-5">
-          <div className="grid gap-4 p-5 md:grid-cols-3">
-            <Field label="New Year" value="2nd Year" options={['2nd Year', '3rd Year', '4th Year']} />
-            <Field label="New Semester" value="3" options={['3', '4', '5', '6']} />
-            <Field label="New Section" value="CSE 3A" options={['CSE 3A', 'CSE 3B']} />
-          </div>
-          <div className="mx-5 mb-5 rounded-xl border border-violet-100 bg-violet-50 p-4">
-            <p className="text-xs font-700 uppercase tracking-wide text-violet-700">Change Preview</p>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
-              <span className="rounded-lg bg-white border border-[#D9E0E8] px-3 py-2 text-[#374151]">
-                Current: 1st Year · Sem 2 · Sec A
-              </span>
-              <span className="text-violet-600 font-700">→</span>
-              <span className="rounded-lg bg-[#1565D8] px-3 py-2 font-700 text-white">
-                New: 2nd Year · Sem 3 · Sec A
-              </span>
-            </div>
-          </div>
-        </Panel>
-
-        <div className="mt-5 flex flex-wrap justify-end gap-2">
-          <button onClick={() => setPreview(true)} className={secondaryButton}>Preview Changes</button>
-          <button
-            disabled={!checked.length}
-            onClick={() => setConfirm(true)}
-            className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-50`}
-          >
-            Apply to Selected
-          </button>
+          ))}
         </div>
 
-        <div className="mt-5">
-          <Notice>
-            Academic Year / Semester / Section changes are admin-controlled. Student academic fields cannot be self-edited.
-          </Notice>
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+          {/* Left — select students */}
+          <div className="space-y-4">
+            <Panel title="Filter Current Students">
+              <div className="grid gap-4 p-5 sm:grid-cols-2">
+                <Field label="Department"  value="CSE"    options={['CSE','ECE','IT','ME']} />
+                <Field label="Current Year"    value="1st Year"  options={['1st Year','2nd Year','3rd Year']} />
+                <Field label="Current Semester" value="2"  options={['1','2','3','4']} />
+                <Field label="Current Section" value="CSE 1A" options={['CSE 1A','CSE 1B']} />
+              </div>
+            </Panel>
+
+            <Panel>
+              <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+                <div>
+                  <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Select Students</h2>
+                  <p className="mt-0.5 text-[13px] font-semibold" style={{ color: C.green }}>
+                    {checked.length === bulkStudents.length ? '68' : checked.length} students selected
+                  </p>
+                </div>
+                <button
+                  onClick={() => setChecked(checked.length ? [] : bulkStudents.map(s => s.usn))}
+                  className={secondaryButton}
+                >
+                  {checked.length ? 'Deselect All' : 'Select All'}
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                    <tr>
+                      <th className="w-12 px-5 py-3" />
+                      {['USN','Student Name','Current Info','Status'].map(h => (
+                        <th key={h} className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.textSecondary }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bulkStudents.map(s => {
+                      const sel = checked.includes(s.usn)
+                      return (
+                        <tr
+                          key={s.usn}
+                          style={{ borderBottom: `1px solid ${C.border}`, background: sel ? '#EAF3FF40' : 'transparent' }}
+                          onClick={() => toggle(s.usn)}
+                          className="cursor-pointer"
+                        >
+                          <td className="px-5 py-[13px]">
+                            <input type="checkbox" checked={sel} onChange={() => toggle(s.usn)} className="size-4 rounded" style={{ accentColor: C.blue }} />
+                          </td>
+                          <td className="px-5 py-[13px] text-[13px] font-semibold" style={{ color: C.navy }}>{s.usn}</td>
+                          <td className="px-5 py-[13px] text-[13px]" style={{ color: C.textSecondary }}>{s.name}</td>
+                          <td className="px-5 py-[13px] text-[13px]" style={{ color: C.textTertiary }}>{s.info}</td>
+                          <td className="px-5 py-[13px]">
+                            <StatusBadge tone={sel ? 'blue' : 'navy'}>{sel ? 'Selected' : 'Not selected'}</StatusBadge>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+          </div>
+
+          {/* Right — new academic details */}
+          <div className="space-y-4">
+            <Panel title="Set New Academic Details">
+              <div className="space-y-4 p-5">
+                <Field label="New Year"     value={newYear} onChange={setNewYear} options={['2nd Year','3rd Year','4th Year']} />
+                <Field label="New Semester" value={newSem}  onChange={setNewSem}  options={['3','4','5','6']} />
+                <Field label="New Section"  value={newSec}  onChange={setNewSec}  options={['CSE 3A','CSE 3B','CSE 3C']} />
+
+                <div className="rounded-xl p-4" style={{ background: C.blueLight, border: `1px solid #BFDBFE` }}>
+                  <p className="text-[12.5px] font-semibold" style={{ color: C.navy }}>Change Preview</p>
+                  <div className="mt-2 flex items-center gap-2 flex-wrap">
+                    <span className="rounded-lg border px-2.5 py-1.5 text-[12px]" style={{ borderColor: C.border, color: C.textSecondary }}>
+                      1st Year · Sem 2 · CSE 1A
+                    </span>
+                    <span className="text-[12px] font-bold" style={{ color: C.blue }}>→</span>
+                    <span className="rounded-lg px-2.5 py-1.5 text-[12px] font-semibold" style={{ background: C.blue, color: C.white }}>
+                      {newYear} · Sem {newSem} · {newSec}
+                    </span>
+                  </div>
+                  <p className="mt-2.5 text-[12px]" style={{ color: C.textSecondary }}>
+                    This update will apply to all{' '}
+                    <strong>{checked.length === bulkStudents.length ? '68' : checked.length}</strong>{' '}
+                    selected students. Review the changes before confirming.
+                  </p>
+                </div>
+              </div>
+            </Panel>
+
+            <Notice>
+              Academic Year / Semester / Section changes are admin-controlled and cannot be reversed by students.
+            </Notice>
+
+            <div className="flex flex-col gap-2">
+              <button onClick={() => setStep(s => Math.min(3, s + 1))} className={secondaryButton}>
+                Preview Changes →
+              </button>
+              <button
+                disabled={!checked.length}
+                onClick={() => setConfirm(true)}
+                className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                Apply to {checked.length === bulkStudents.length ? '68' : checked.length} Students
+              </button>
+            </div>
+          </div>
         </div>
-
-        {preview && (
-          <Panel className="mt-5 border-violet-100 bg-violet-50 p-5">
-            <p className="font-700 text-violet-900">Preview ready</p>
-            <p className="mt-1 text-sm text-violet-800">
-              The change will be applied to{' '}
-              <span className="font-700">{checked.length}</span> selected student records.
-            </p>
-          </Panel>
-        )}
-
-        {done && <Toast message="Academic information updated successfully." />}
       </AdminContent>
 
       {confirm && (
         <Modal title="Apply Academic Changes?" onClose={() => setConfirm(false)}>
-          <p className="text-sm text-[#4B5563]">
-            The selected students&apos; academic information will be updated. This action cannot be undone.
-          </p>
-          <div className="mt-5 flex justify-end gap-2">
+          <div className="rounded-xl p-4 mb-5" style={{ background: C.orangeLight, border: `1px solid #FED7AA` }}>
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="mt-0.5 size-4 shrink-0" style={{ color: C.orange }} />
+              <p className="text-[13px]" style={{ color: '#92400E' }}>
+                This will update academic information for <strong>{checked.length === bulkStudents.length ? '68' : checked.length}</strong> students. This action is logged for audit purposes.
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
             <button onClick={() => setConfirm(false)} className={secondaryButton}>Cancel</button>
-            <button
-              onClick={() => { setConfirm(false); setDone(true) }}
-              className={primaryButton}
-            >
-              Apply Changes
+            <button onClick={() => { setConfirm(false); setDone(true) }} className={primaryButton}>
+              Confirm & Apply
             </button>
           </div>
         </Modal>
       )}
+      {done && <Toast message="Academic information updated successfully." />}
     </AdminShell>
   )
 }
 
-// ── Student Profile & Device ──────────────────────────────────────────────────
+// ─── Student Profile & Device ─────────────────────────────────────────────────
 export function StudentProfilePage() {
-  const [replace, setReplace] = useState(false)
-  const [replaced, setReplaced] = useState(false)
+  const [activeTab, setActiveTab] = useState<'device' | 'academic' | 'attendance'>('device')
+  const [replacing, setReplacing] = useState(false)
+  const [replaced,  setReplaced]  = useState(false)
+
+  const tabs = [
+    { key: 'device',     label: 'Registered Device'  },
+    { key: 'academic',   label: 'Academic Details'    },
+    { key: 'attendance', label: 'Attendance Summary'  },
+  ] as const
 
   return (
     <AdminShell>
       <AdminContent>
         <PageHeader
           title="Student Profile & Device"
-          description="Rahul Sharma · 01CS123 · CSE 3A"
+          description="View student details, manage registered devices and account status."
           actions={
             <Link href="/admin/students" className={secondaryButton}>
               <ArrowLeft className="size-4" /> Back to Students
@@ -674,140 +831,205 @@ export function StudentProfilePage() {
           }
         />
 
-        {/* Search & filters bar */}
-        <div className="mb-5 flex flex-wrap gap-3">
-          <div className="relative min-w-[240px] flex-1">
-            <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#9CA3AF]" />
-            <input
-              placeholder="Search by USN or Name"
-              className="h-11 w-full rounded-lg border border-[#D9E0E8] bg-white pl-10 pr-4 text-sm text-[#172033] outline-none placeholder:text-[#9CA3AF] focus:border-[#1565D8]"
-            />
-          </div>
-          {['Department', 'Year', 'Semester', 'Section'].map((label, i) => (
-            <Field
-              key={label}
-              label={label}
-              value={['CSE', '3rd Year', '5', 'CSE 3A'][i]}
-              options={
-                i === 0 ? ['CSE', 'ECE'] :
-                i === 1 ? ['2nd Year', '3rd Year'] :
-                i === 2 ? ['4', '5'] :
-                ['CSE 3A', 'CSE 3B']
-              }
-              required={false}
-            />
-          ))}
-          <button className={`${secondaryButton} self-end`}>Reset</button>
-        </div>
-
-        <div className="grid gap-5 lg:grid-cols-[1.35fr_.65fr]">
-          {/* Profile panel */}
-          <Panel className="p-6">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="flex size-14 items-center justify-center rounded-2xl bg-[#EAF3FF] text-lg font-800 text-[#1565D8]">
+        <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+          {/* Left identity card */}
+          <div className="space-y-4">
+            <Panel>
+              <div className="p-6 text-center">
+                <div
+                  className="mx-auto flex size-16 items-center justify-center rounded-2xl text-xl font-bold text-white"
+                  style={{ background: C.blue }}
+                >
                   RS
                 </div>
-                <div>
-                  <p className="text-xs font-700 uppercase tracking-[0.12em] text-[#1565D8]">
-                    Student Profile
+                <p className="mt-3 text-[17px] font-semibold" style={{ color: C.navy }}>Rahul Sharma</p>
+                <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>01CS123 · CSE 3A</p>
+                <div className="mt-3 flex items-center justify-center gap-2">
+                  <StatusBadge tone="green">Active</StatusBadge>
+                  <StatusBadge tone="blue">Linked</StatusBadge>
+                </div>
+                <button className={`${secondaryButton} mt-4 w-full`}>View Full Profile</button>
+              </div>
+
+              <div style={{ borderTop: `1px solid ${C.border}` }}>
+                <div className="px-5 py-4">
+                  <p className="text-[12px] font-semibold uppercase tracking-widest mb-3" style={{ color: C.textTertiary }}>
+                    Basic Information
                   </p>
-                  <h2 className="text-2xl font-800 text-[#0B1F3A]">Rahul Sharma</h2>
-                  <p className="mt-0.5 text-sm text-[#64748B]">01CS123 · CSE 3A</p>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <StatusBadge tone="green">Active</StatusBadge>
-                <StatusBadge tone="blue">Linked</StatusBadge>
-                <StatusBadge tone="green">Verified</StatusBadge>
-              </div>
-            </div>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {[
-                ['Full Name', 'Rahul Sharma'],
-                ['USN', '01CS123'],
-                ['Department', 'CSE'],
-                ['Year', '3rd Year'],
-                ['Semester', '5'],
-                ['Section', 'CSE 3A'],
-                ['Mobile', '+91 98765 43210'],
-              ].map(([label, value]) => (
-                <div key={label} className="rounded-lg border border-[#D9E0E8] bg-[#F7F9FC] px-4 py-3">
-                  <p className="text-xs text-[#64748B]">{label}</p>
-                  <p className="mt-0.5 text-sm font-600 text-[#374151]">{value}</p>
-                </div>
-              ))}
-            </div>
-          </Panel>
-
-          {/* Device panel */}
-          <div className="space-y-4">
-            <Panel className="p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                  <Laptop className="size-5" />
-                </div>
-                <div>
-                  <h2 className="font-700 text-[#0B1F3A]">Device Details</h2>
-                  <p className="text-xs text-[#64748B]">Registered device status</p>
-                </div>
-              </div>
-              <div className="mt-5 space-y-3">
-                {[
-                  ['Device Status', 'Linked'],
-                  ['Verification', 'Verified'],
-                  ['Registration', replaced ? 'Replacement Pending' : 'Active'],
-                ].map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between border-b border-[#D9E0E8] pb-3 text-sm">
-                    <span className="text-[#64748B]">{label}</span>
-                    <StatusBadge tone={replaced && label === 'Registration' ? 'orange' : 'green'}>
-                      {value}
-                    </StatusBadge>
+                  <div className="space-y-3">
+                    {[
+                      ['Full Name',   'Rahul Sharma'],
+                      ['USN',        '01CS123'],
+                      ['Department', 'CSE'],
+                      ['Year',       '3rd Year'],
+                      ['Section',    'CSE 3A'],
+                      ['Semester',   '5'],
+                      ['Mobile',     '+91 98765 43210'],
+                    ].map(([l, v]) => (
+                      <div key={l} className="flex items-start justify-between gap-2">
+                        <span className="text-[12.5px]" style={{ color: C.textTertiary }}>{l}</span>
+                        <span className="text-[12.5px] font-medium text-right" style={{ color: C.navy }}>{v}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
-              <button
-                onClick={() => setReplace(true)}
-                className={`${secondaryButton} mt-5 w-full border-orange-200 text-orange-700 hover:bg-orange-50`}
-              >
-                <ShieldCheck className="size-4" /> Replace Device (Admin)
-              </button>
-            </Panel>
-
-            <Panel className="p-5 bg-[#FFF9EF] border-orange-100">
-              <p className="text-xs font-700 uppercase tracking-[0.12em] text-orange-700">Admin Notice</p>
-              <p className="mt-2 text-sm text-[#374151]">
-                Replacing a device requires the student to register a new authorized device. Students cannot self-change their device.
-              </p>
             </Panel>
           </div>
-        </div>
 
-        <div className="mt-5">
-          <Notice>
-            Admin can inspect and manage the registered device. Students cannot self-change their device.
-          </Notice>
+          {/* Right tabbed area */}
+          <div className="space-y-4">
+            {/* Tabs */}
+            <div className="flex rounded-xl bg-white p-1" style={{ border: `1px solid ${C.border}` }}>
+              {tabs.map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className="flex-1 rounded-lg py-2 text-[13.5px] font-medium transition-all"
+                  style={
+                    activeTab === tab.key
+                      ? { background: C.blue, color: C.white, fontWeight: 600 }
+                      : { color: C.textSecondary }
+                  }
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Device tab */}
+            {activeTab === 'device' && (
+              <Panel>
+                <div className="flex items-start justify-between p-5">
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex size-10 items-center justify-center rounded-xl" style={{ background: C.greenLight }}>
+                        <Smartphone className="size-5" style={{ color: C.green }} />
+                      </div>
+                      <div>
+                        <p className="text-[14px] font-semibold" style={{ color: C.navy }}>Linked Device</p>
+                        <p className="text-[12.5px]" style={{ color: C.textTertiary }}>1 device registered</p>
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={() => setReplacing(true)} className={secondaryButton}>
+                    <Plus className="size-4" /> Add / Replace Device
+                  </button>
+                </div>
+
+                <div style={{ borderTop: `1px solid ${C.border}` }}>
+                  <div className="p-5 grid gap-4 sm:grid-cols-2">
+                    {(
+                      [
+                        ['Device Name',    "Rahul's iPhone",        Smartphone],
+                        ['Device Type',    'iOS',                   Laptop],
+                        ['Device ID',      'A1B2-C3D4-E5F6',       Monitor],
+                        ['Registered On',  '12 Aug 2025, 10:24 AM', Shield],
+                        ['Status',         'Active',                Check],
+                      ] as [string, string, React.ElementType][]
+                    ).map(([label, value, I]) => (
+                        <div
+                          key={label}
+                          className="flex items-start gap-3 rounded-xl p-4"
+                          style={{ background: C.blueFaint, border: `1px solid ${C.border}` }}
+                        >
+                          <I className="size-4 mt-0.5 shrink-0" style={{ color: C.blue }} />
+                          <div>
+                            <p className="text-[12px]" style={{ color: C.textTertiary }}>{label}</p>
+                            <p className="mt-0.5 text-[13.5px] font-semibold" style={{ color: C.navy }}>{value}</p>
+                          </div>
+                        </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mx-5 mb-5 rounded-xl p-4" style={{ background: C.greenLight, border: `1px solid #BBF7D0` }}>
+                  <p className="text-[13px] font-semibold" style={{ color: '#14532D' }}>
+                    Login & Security
+                  </p>
+                  <div className="mt-2 flex justify-between text-[12.5px]">
+                    <span style={{ color: '#14532D' }}>Last Login</span>
+                    <span className="font-medium" style={{ color: '#14532D' }}>12 Sep 2025, 08:45 AM</span>
+                  </div>
+                  <div className="mt-1 flex justify-between text-[12.5px]">
+                    <span style={{ color: '#14532D' }}>Account Status</span>
+                    <StatusBadge tone="green">Active</StatusBadge>
+                  </div>
+                </div>
+              </Panel>
+            )}
+
+            {/* Academic tab */}
+            {activeTab === 'academic' && (
+              <Panel title="Academic Details">
+                <div className="grid gap-3 p-5 sm:grid-cols-2">
+                  {[
+                    ['Department',    'CSE'], ['Year',        '3rd Year'],
+                    ['Semester',      '5'],   ['Section',     'CSE 3A'],
+                    ['Academic Year', '2025–26'], ['Enrolled', '15 Aug 2023'],
+                  ].map(([l, v]) => (
+                    <div key={l} className="rounded-xl p-4" style={{ background: C.blueFaint, border: `1px solid ${C.border}` }}>
+                      <p className="text-[12px]" style={{ color: C.textTertiary }}>{l}</p>
+                      <p className="mt-0.5 text-[14px] font-semibold" style={{ color: C.navy }}>{v}</p>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+            )}
+
+            {/* Attendance tab */}
+            {activeTab === 'attendance' && (
+              <Panel title="Attendance Summary">
+                <div className="p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[14px] font-semibold" style={{ color: C.navy }}>Overall Attendance</p>
+                    <span className="text-[28px] font-bold" style={{ color: C.green }}>84%</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: C.border }}>
+                    <div className="h-full rounded-full" style={{ width: '84%', background: C.green }} />
+                  </div>
+                  <p className="text-[12.5px]" style={{ color: C.textTertiary }}>
+                    Attendance is above the minimum threshold of 75%.
+                  </p>
+
+                  <div className="grid gap-3 sm:grid-cols-2 mt-4">
+                    {[
+                      ['Classes Attended', '101 / 120'],
+                      ['This Month',       '22 / 25'],
+                      ['Highest Subject',  'Math — 96%'],
+                      ['Lowest Subject',   'OS Lab — 70%'],
+                    ].map(([l, v]) => (
+                      <div key={l} className="rounded-xl p-4" style={{ background: C.blueFaint, border: `1px solid ${C.border}` }}>
+                        <p className="text-[12px]" style={{ color: C.textTertiary }}>{l}</p>
+                        <p className="mt-0.5 text-[14px] font-semibold" style={{ color: C.navy }}>{v}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Panel>
+            )}
+          </div>
         </div>
       </AdminContent>
 
-      {replace && (
-        <Modal title="Replace Registered Device?" onClose={() => setReplace(false)}>
-          <p className="text-sm text-[#4B5563]">
-            This action replaces the student&apos;s currently registered device and requires the student to register a new authorized device.
+      {replacing && (
+        <Modal title="Replace Registered Device?" onClose={() => setReplacing(false)}>
+          <p className="text-[13.5px]" style={{ color: C.textSecondary }}>
+            This will remove the currently registered device and require the student to register a new authorized device on next login.
           </p>
           <div className="mt-5 flex justify-end gap-2">
-            <button onClick={() => setReplace(false)} className={secondaryButton}>Cancel</button>
+            <button onClick={() => setReplacing(false)} className={secondaryButton}>Cancel</button>
             <button
-              onClick={() => { setReplace(false); setReplaced(true) }}
-              className={`${primaryButton} bg-[#C24141] hover:bg-red-700`}
+              onClick={() => { setReplacing(false); setReplaced(true) }}
+              style={{ background: C.red }}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg px-4 text-[13.5px] font-semibold text-white hover:opacity-90"
             >
               Replace Device
             </button>
           </div>
         </Modal>
       )}
-      {replaced && <Toast message="Device replacement initiated successfully." />}
+      {replaced && <Toast message="Device replacement initiated." />}
     </AdminShell>
   )
 }
