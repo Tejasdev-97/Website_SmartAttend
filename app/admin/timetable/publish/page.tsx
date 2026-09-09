@@ -1,5 +1,5 @@
-import { TimetablePublishEnhanced } from '@/components/smartattend-admin-pages'
+import { TimetablePublishPage } from '@/components/smartattend-admin-pages'
 
 export default function Page() {
-  return <TimetablePublishEnhanced />
+  return <TimetablePublishPage />
 }

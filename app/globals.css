@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
@@ -23,38 +24,47 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-navy: #0b1f3a;
-  --color-blue-600: #2563eb;
-  --color-blue-700: #1d4ed8;
-  --font-sans: 'Inter', 'Segoe UI', sans-serif;
-  --shadow-card: 0 1px 3px rgb(15 23 42 / 0.04), 0 1px 2px rgb(15 23 42 / 0.02);
+  --color-navy: #0B1F3A;
+  --color-blue-brand: #1565D8;
+  --color-blue-accent: #247BFF;
+  --color-blue-soft: #EAF3FF;
+  --color-ivory: #FAF7F0;
+  --color-cream: #FFF9EF;
+  --color-apricot: #FFF1E6;
+  --color-orange-accent: #E98A45;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --shadow-card: 0 1px 4px rgb(11 31 58 / 0.06), 0 1px 2px rgb(11 31 58 / 0.04);
+  --shadow-elevated: 0 4px 16px rgb(11 31 58 / 0.10), 0 1px 4px rgb(11 31 58 / 0.06);
+  --shadow-modal: 0 20px 60px rgb(11 31 58 / 0.18), 0 4px 16px rgb(11 31 58 / 0.10);
 }
 
 :root {
   color-scheme: light;
-  --background: #f8fafc;
-  --foreground: #111827;
+  --background: #F7F9FC;
+  --foreground: #172033;
   --card: #ffffff;
-  --card-foreground: #111827;
+  --card-foreground: #172033;
   --popover: #ffffff;
-  --popover-foreground: #111827;
-  --primary: #2563eb;
+  --popover-foreground: #172033;
+  --primary: #1565D8;
   --primary-foreground: #ffffff;
-  --secondary: #eff6ff;
-  --secondary-foreground: #0b1f3a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #eff6ff;
-  --accent-foreground: #0b1f3a;
-  --destructive: #dc2626;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #2563eb;
-  --radius: 0.75rem;
+  --secondary: #EAF3FF;
+  --secondary-foreground: #0B1F3A;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --accent: #EAF3FF;
+  --accent-foreground: #0B1F3A;
+  --destructive: #C24141;
+  --border: #D9E0E8;
+  --input: #D9E0E8;
+  --ring: #1565D8;
+  --radius: 0.5rem;
+  --success: #16845B;
+  --warning: #C87822;
 }
 
 * { @apply border-border outline-ring/50; }
 html { background: var(--background); }
-body { @apply bg-background text-foreground font-sans antialiased; }
+body { @apply bg-background text-foreground font-sans antialiased; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; }
 button, a, input { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid #1565D8; outline-offset: 2px; }
