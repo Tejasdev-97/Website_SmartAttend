@@ -854,6 +854,7 @@ const faculty = [
 const greenFacultyColors = ['#1E40AF','#5B21B6','#166534','#92400E','#1E40AF','#5B21B6']
 
 export function FacultyPage() {
+  const router = useRouter()
   const [open,  setOpen]  = useState(false)
   const [query, setQuery] = useState('')
   const filtered = faculty.filter(f =>
@@ -949,8 +950,8 @@ export function FacultyPage() {
                     </td>
                     <td className="px-5 py-[14px] text-right">
                       <button
-                        onClick={() => setOpen(true)}
-                        aria-label={`Edit ${f.name}`}
+                        onClick={() => router.push(`/admin/faculty/${i + 1}`)}
+                        aria-label={`View ${f.name}`}
                         className="rounded-lg p-2 transition-colors hover:bg-[#EAF3FF]"
                         style={{ color: C.textTertiary }}
                       >

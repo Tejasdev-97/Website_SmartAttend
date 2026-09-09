@@ -3,10 +3,10 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import {
-  AlertTriangle, ArrowLeft, BookOpen, Check, CheckCircle2,
-  ChevronDown, CloudUpload, Edit3, FileSpreadsheet,
-  Laptop, Monitor, Plus, Save, Search, Shield,
-  Smartphone, Upload, Users, X,
+  Activity, AlertTriangle, ArrowLeft, BatteryCharging, BookOpen, Check, CheckCircle2,
+  ChevronDown, Clock, CloudUpload, Edit3, FileSpreadsheet,
+  Laptop, Monitor, Plus, Radio, RefreshCw, Save, Search, Shield,
+  Smartphone, Upload, UserCheck, Users, Wifi, X,
 } from 'lucide-react'
 import {
   AdminContent, AdminShell, C, PageHeader, Panel,
@@ -23,8 +23,8 @@ function Label({ children, required }: { children: React.ReactNode; required?: b
   )
 }
 
-function Field({ label, value, onChange, options, required = true, placeholder }: {
-  label: string; value: string; onChange?: (v: string) => void
+function Field({ label, value = '', onChange, options, required = true, placeholder }: {
+  label: string; value?: string; onChange?: (v: string) => void
   options?: string[]; required?: boolean; placeholder?: string
 }) {
   const cls = "h-10 w-full rounded-lg border bg-white text-[13.5px] outline-none transition-all"
@@ -1135,3 +1135,391 @@ export function StudentProfilePage() {
     </AdminShell>
   )
 }
+
+// ─── Real-Time Attendance Live Tracker ─────────────────────────────────────────
+const activeClasses = [
+  { id: '1', subject: 'Data Structures (CS301)', section: 'CSE 3A', room: 'Room 201', faculty: 'Prof. Rohit Sharma', present: 64, total: 68, beacon: 'BCN-201 (Active)', status: 'In Progress' },
+  { id: '2', subject: 'Digital Logic (CS302)',   section: 'CSE 3B', room: 'Room 203', faculty: 'Prof. Neha Joshi',   present: 61, total: 66, beacon: 'BCN-203 (Active)', status: 'In Progress' },
+  { id: '3', subject: 'Signals & Systems (EC201)', section: 'ECE 2A', room: 'Room 305', faculty: 'Prof. Amit Verma',  present: 58, total: 62, beacon: 'BCN-305 (Active)', status: 'In Progress' },
+  { id: '4', subject: 'OS Lab (CS304)',          section: 'CSE 3A', room: 'Lab 2',    faculty: 'Prof. Pooja Singh', present: 38, total: 40, beacon: 'BCN-LAB2 (Active)', status: 'In Progress' },
+]
+
+const liveFeed = [
+  { time: '10:42:15 AM', usn: '01CS123', student: 'Rahul Sharma',  class: 'CSE 3A · DS',   beacon: 'BCN-201', method: 'BLE Auto', status: 'Present' },
+  { time: '10:42:01 AM', usn: '01CS124', student: 'Ananya Singh',  class: 'CSE 3A · DS',   beacon: 'BCN-201', method: 'BLE Auto', status: 'Present' },
+  { time: '10:41:48 AM', usn: '01CS125', student: 'Vikram Patel',  class: 'CSE 3A · DS',   beacon: 'BCN-201', method: 'BLE Auto', status: 'Present' },
+  { time: '10:40:12 AM', usn: '01EC203', student: 'Ishita Rao',    class: 'ECE 2A · S&S',  beacon: 'BCN-305', method: 'Manual Override', status: 'Present' },
+  { time: '10:39:55 AM', usn: '01CS126', student: 'Neha Verma',    class: 'CSE 3A · DS',   beacon: 'BCN-201', method: 'BLE Auto', status: 'Late Check-in' },
+]
+
+export function LiveAttendancePage() {
+  const [modal, setModal] = useState(false)
+  const [toast, setToast] = useState(false)
+
+  return (
+    <AdminShell>
+      <AdminContent>
+        <PageHeader
+          title="Real-Time Attendance Monitor"
+          description="Live campus tracking of ongoing sessions, BLE beacon signals, and check-in streams."
+          actions={
+            <button onClick={() => setToast(true)} className={primaryButton}>
+              <RefreshCw className="size-4" /> Refresh Live Feed
+            </button>
+          }
+        />
+
+        {/* Overview Stats */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-7">
+          {[
+            { label: 'Active Sessions Now', value: '14 Classes', sub: 'Across 4 blocks', icon: Activity, tone: 'blue' },
+            { label: 'Live Check-in Rate', value: '92.4%', sub: '2,240 / 2,424 checked in', icon: UserCheck, tone: 'green' },
+            { label: 'Beacons Transmitting', value: '46 / 48', sub: '95.8% operational', icon: Radio, tone: 'purple' },
+            { label: 'Manual Overrides Today', value: '6', sub: 'Admin / Faculty logged', icon: Clock, tone: 'orange' },
+          ].map(s => {
+            const Icon = s.icon
+            return (
+              <Panel key={s.label} className="p-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-[12.5px] font-medium" style={{ color: C.textSecondary }}>{s.label}</p>
+                    <p className="mt-2 text-[30px] font-bold leading-none" style={{ color: C.navy }}>{s.value}</p>
+                    <p className="mt-1.5 text-[12px]" style={{ color: C.textSecondary }}>{s.sub}</p>
+                  </div>
+                  <div className="flex size-10 items-center justify-center rounded-xl" style={{ background: C.blueLight }}>
+                    <Icon className="size-5" style={{ color: C.blue }} />
+                  </div>
+                </div>
+              </Panel>
+            )
+          })}
+        </div>
+
+        {/* Ongoing Classes Grid */}
+        <div className="mb-7">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Ongoing Sessions</h2>
+            <span className="flex items-center gap-1.5 text-[12px] font-semibold" style={{ color: C.green }}>
+              <span className="size-2 rounded-full animate-pulse" style={{ background: C.green }} /> Live Pulse Active
+            </span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {activeClasses.map(cls => {
+              const pct = Math.round((cls.present / cls.total) * 100)
+              return (
+                <Panel key={cls.id} className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="rounded-lg px-2.5 py-1 text-[11.5px] font-bold" style={{ background: C.blueLight, color: C.blue }}>
+                      {cls.room}
+                    </span>
+                    <StatusBadge tone="green">In Progress</StatusBadge>
+                  </div>
+                  <p className="text-[14px] font-bold truncate" style={{ color: C.navy }}>{cls.subject}</p>
+                  <p className="mt-0.5 text-[12.5px]" style={{ color: C.textSecondary }}>{cls.section} · {cls.faculty}</p>
+                  
+                  <div className="mt-4 pt-3" style={{ borderTop: `1px solid ${C.border}` }}>
+                    <div className="flex justify-between text-[12px] font-semibold mb-1">
+                      <span style={{ color: C.textSecondary }}>Attendance Rate</span>
+                      <span style={{ color: C.navy }}>{cls.present} / {cls.total} ({pct}%)</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: C.border }}>
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: C.blue }} />
+                    </div>
+                    <p className="mt-2 text-[11px] font-mono" style={{ color: C.textTertiary }}>Beacon: {cls.beacon}</p>
+                  </div>
+                </Panel>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Live Attendance Stream Table */}
+        <Panel title="Live Check-in Activity Log" description="Real-time stream of incoming BLE attendance scans and manual overrides.">
+          <div className="flex justify-end p-4" style={{ borderBottom: `1px solid ${C.border}` }}>
+            <button onClick={() => setModal(true)} className={primaryButton}>
+              + Log Manual Attendance
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[750px]">
+              <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                <tr>
+                  {['Time','USN','Student Name','Class / Subject','Beacon ID','Verification Method','Status'].map(h => (
+                    <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {liveFeed.map((row, i) => (
+                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}` }}
+                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
+                    onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                  >
+                    <td className="px-5 py-[13px] font-mono text-[12.5px]" style={{ color: C.textSecondary }}>{row.time}</td>
+                    <td className="px-5 py-[13px] font-semibold text-[13px]" style={{ color: C.navy }}>{row.usn}</td>
+                    <td className="px-5 py-[13px] text-[13.5px] font-medium" style={{ color: C.navy }}>{row.student}</td>
+                    <td className="px-5 py-[13px] text-[13px]" style={{ color: C.textSecondary }}>{row.class}</td>
+                    <td className="px-5 py-[13px] font-mono text-[12.5px]" style={{ color: C.blue }}>{row.beacon}</td>
+                    <td className="px-5 py-[13px] text-[13px]">
+                      <StatusBadge tone={row.method === 'BLE Auto' ? 'blue' : 'purple'}>{row.method}</StatusBadge>
+                    </td>
+                    <td className="px-5 py-[13px]">
+                      <StatusBadge tone={row.status === 'Present' ? 'green' : 'orange'}>{row.status}</StatusBadge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+      </AdminContent>
+
+      {modal && (
+        <Modal title="Log Manual Attendance Override" onClose={() => setModal(false)}>
+          <div className="space-y-4">
+            <Field label="Student USN" placeholder="e.g. 01CS123" />
+            <Field label="Select Subject / Class" options={['Data Structures (CS301)','Digital Logic (CS302)','Signals & Systems (EC201)']} />
+            <Field label="Override Reason" options={['Duty Leave (Event)','Medical Certificate','Device Bluetooth Error','Faculty Manual Request']} />
+            <div className="flex justify-end gap-2 pt-2">
+              <button onClick={() => setModal(false)} className={secondaryButton}>Cancel</button>
+              <button onClick={() => { setModal(false); setToast(true) }} className={primaryButton}>Submit Override</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+      {toast && <Toast message="Live attendance feed updated." />}
+    </AdminShell>
+  )
+}
+
+// ─── Faculty Profile & Details Page ───────────────────────────────────────────
+export function FacultyProfilePage() {
+  const [toast, setToast] = useState(false)
+  return (
+    <AdminShell>
+      <AdminContent>
+        <PageHeader
+          title="Faculty Profile & Teaching Schedule"
+          description="Detailed faculty profile, assigned subjects, and session analytics."
+          actions={
+            <Link href="/admin/faculty" className={secondaryButton}>
+              <ArrowLeft className="size-4" /> Back to Faculty
+            </Link>
+          }
+        />
+
+        <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+          {/* Identity card */}
+          <div className="space-y-4">
+            <Panel>
+              <div className="p-6 text-center">
+                <div
+                  className="mx-auto flex size-16 items-center justify-center rounded-2xl text-xl font-bold text-white"
+                  style={{ background: C.navy }}
+                >
+                  RS
+                </div>
+                <p className="mt-3 text-[17px] font-semibold" style={{ color: C.navy }}>Prof. Rohit Sharma</p>
+                <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>FAC123 · Associate Professor</p>
+                <div className="mt-3 flex items-center justify-center gap-2">
+                  <StatusBadge tone="green">Active</StatusBadge>
+                  <StatusBadge tone="blue">CSE Department</StatusBadge>
+                </div>
+                <button onClick={() => setToast(true)} className={`${secondaryButton} mt-4 w-full`}>Edit Assignments</button>
+              </div>
+
+              <div style={{ borderTop: `1px solid ${C.border}` }}>
+                <div className="px-5 py-4 space-y-3">
+                  {[
+                    ['Faculty ID', 'FAC123'],
+                    ['Department', 'CSE'],
+                    ['Designation','Associate Prof.'],
+                    ['Email',      'rohit@college.edu.in'],
+                    ['Mobile',     '+91 98765 12345'],
+                    ['Experience', '8 Years'],
+                  ].map(([l, v]) => (
+                    <div key={l} className="flex justify-between text-[12.5px]">
+                      <span style={{ color: C.textTertiary }}>{l}</span>
+                      <span className="font-semibold" style={{ color: C.navy }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Panel>
+          </div>
+
+          {/* Right — teaching workload & schedule */}
+          <div className="space-y-5">
+            <Panel title="Assigned Subjects & Sections">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left min-w-[600px]">
+                  <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                    <tr>
+                      {['Subject Code','Subject Name','Section','Weekly Hours','Room','Status'].map(h => (
+                        <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { code: 'CS301', name: 'Data Structures', section: 'CSE 3A', hours: '4 hrs/wk', room: 'Room 201', status: 'Active' },
+                      { code: 'CS301', name: 'Data Structures', section: 'CSE 3B', hours: '4 hrs/wk', room: 'Room 203', status: 'Active' },
+                      { code: 'CS304', name: 'Operating Systems Lab', section: 'CSE 3A', hours: '2 hrs/wk', room: 'Lab 2', status: 'Active' },
+                    ].map(row => (
+                      <tr key={row.section + row.code} style={{ borderBottom: `1px solid ${C.border}` }}>
+                        <td className="px-5 py-[13px] font-bold" style={{ color: C.blue }}>{row.code}</td>
+                        <td className="px-5 py-[13px] font-semibold" style={{ color: C.navy }}>{row.name}</td>
+                        <td className="px-5 py-[13px]" style={{ color: C.textSecondary }}>{row.section}</td>
+                        <td className="px-5 py-[13px]" style={{ color: C.textSecondary }}>{row.hours}</td>
+                        <td className="px-5 py-[13px]" style={{ color: C.navy }}>{row.room}</td>
+                        <td className="px-5 py-[13px]"><StatusBadge tone="green">{row.status}</StatusBadge></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Panel>
+
+            <Panel title="Weekly Teaching Timetable">
+              <div className="p-5">
+                <div className="grid gap-3 sm:grid-cols-5">
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => (
+                    <div key={day} className="rounded-xl p-3" style={{ background: C.blueFaint, border: `1px solid ${C.border}` }}>
+                      <p className="text-[12px] font-bold uppercase tracking-wider mb-2" style={{ color: C.blue }}>{day}</p>
+                      <div className="space-y-2">
+                        <div className="rounded-lg bg-white p-2.5 shadow-sm border border-[#D9E4F2]">
+                          <p className="text-[11px] font-bold" style={{ color: C.navy }}>10:00–11:00 AM</p>
+                          <p className="text-[12px] font-semibold" style={{ color: C.blue }}>DS (CS301)</p>
+                          <p className="text-[10.5px]" style={{ color: C.textSecondary }}>CSE 3A · Room 201</p>
+                        </div>
+                        <div className="rounded-lg bg-white p-2.5 shadow-sm border border-[#D9E4F2]">
+                          <p className="text-[11px] font-bold" style={{ color: C.navy }}>02:00–03:00 PM</p>
+                          <p className="text-[12px] font-semibold" style={{ color: C.purple }}>OS Lab</p>
+                          <p className="text-[10.5px]" style={{ color: C.textSecondary }}>CSE 3A · Lab 2</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Panel>
+          </div>
+        </div>
+        {toast && <Toast message="Faculty assignment settings updated." />}
+      </AdminContent>
+    </AdminShell>
+  )
+}
+
+// ─── BLE Beacons & Device Management Page ─────────────────────────────────────
+const beaconList = [
+  { id: 'BCN-201', room: 'Room 201', building: 'Main Block', dept: 'CSE', battery: '94%', rssi: '-62 dBm', status: 'Online' },
+  { id: 'BCN-203', room: 'Room 203', building: 'Main Block', dept: 'CSE', battery: '88%', rssi: '-68 dBm', status: 'Online' },
+  { id: 'BCN-305', room: 'Room 305', building: 'ECE Block',  dept: 'ECE', battery: '18%', rssi: '-74 dBm', status: 'Low Battery' },
+  { id: 'BCN-LAB2',room: 'Lab 2',    building: 'CS Block',   dept: 'CSE', battery: '91%', rssi: '-58 dBm', status: 'Online' },
+  { id: 'BCN-101', room: 'Room 101', building: 'Civil Block',dept: 'CE',  battery: '0%',  rssi: 'Offline', status: 'Offline' },
+]
+
+export function BeaconDevicesPage() {
+  const [modal, setModal] = useState(false)
+  const [toast, setToast] = useState(false)
+
+  return (
+    <AdminShell>
+      <AdminContent>
+        <PageHeader
+          title="BLE Beacons & Device Management"
+          description="Manage classroom Bluetooth Low Energy (BLE) beacons, gateway connectivity, and device linking policies."
+          actions={
+            <button onClick={() => setModal(true)} className={primaryButton}>
+              <Plus className="size-4" /> Register New Beacon
+            </button>
+          }
+        />
+
+        {/* Stats row */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-7">
+          {[
+            { label: 'Total Beacons Deployed', value: '48', sub: 'Across 6 academic blocks', icon: Radio, tone: 'blue' },
+            { label: 'Online & Broadcasting', value: '46', sub: '95.8% healthy', icon: Wifi, tone: 'green' },
+            { label: 'Low Battery / Warnings', value: '2 Beacons', sub: 'Requires battery replace', icon: BatteryCharging, tone: 'orange' },
+            { label: 'Linked Student Devices', value: '2,812', sub: 'Registered BLE MAC IDs', icon: Smartphone, tone: 'purple' },
+          ].map(s => {
+            const Icon = s.icon
+            return (
+              <Panel key={s.label} className="p-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-[12.5px] font-medium" style={{ color: C.textSecondary }}>{s.label}</p>
+                    <p className="mt-2 text-[30px] font-bold leading-none" style={{ color: C.navy }}>{s.value}</p>
+                    <p className="mt-1.5 text-[12px]" style={{ color: C.textSecondary }}>{s.sub}</p>
+                  </div>
+                  <div className="flex size-10 items-center justify-center rounded-xl" style={{ background: C.blueLight }}>
+                    <Icon className="size-5" style={{ color: C.blue }} />
+                  </div>
+                </div>
+              </Panel>
+            )
+          })}
+        </div>
+
+        {/* Beacon Directory Table */}
+        <Panel title="Classroom BLE Beacon Directory">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[800px]">
+              <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                <tr>
+                  {['Beacon ID','Classroom / Room','Building','Department','Battery Level','Signal Strength (RSSI)','Status','Actions'].map(h => (
+                    <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {beaconList.map(b => (
+                  <tr key={b.id} style={{ borderBottom: `1px solid ${C.border}` }}
+                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
+                    onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                  >
+                    <td className="px-5 py-[14px] font-mono font-bold text-[13px]" style={{ color: C.blue }}>{b.id}</td>
+                    <td className="px-5 py-[14px] font-semibold text-[13.5px]" style={{ color: C.navy }}>{b.room}</td>
+                    <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{b.building}</td>
+                    <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{b.dept}</td>
+                    <td className="px-5 py-[14px] font-semibold text-[13px]" style={{ color: parseInt(b.battery) < 20 ? C.red : C.navy }}>{b.battery}</td>
+                    <td className="px-5 py-[14px] font-mono text-[12.5px]" style={{ color: C.textSecondary }}>{b.rssi}</td>
+                    <td className="px-5 py-[14px]">
+                      <StatusBadge tone={b.status === 'Online' ? 'green' : b.status === 'Low Battery' ? 'orange' : 'red'}>
+                        {b.status}
+                      </StatusBadge>
+                    </td>
+                    <td className="px-5 py-[14px]">
+                      <button onClick={() => setToast(true)} className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-[#EAF3FF]" style={{ borderColor: C.border, color: C.blue }}>
+                        <Edit3 className="size-3.5" /> Rebind
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+      </AdminContent>
+
+      {modal && (
+        <Modal title="Register BLE Beacon" onClose={() => setModal(false)}>
+          <div className="space-y-4">
+            <Field label="Beacon UUID / ID" placeholder="e.g. BCN-401" />
+            <Field label="Assign Classroom Room No." placeholder="e.g. Room 401" />
+            <Field label="Building" options={['Main Block','CS Block','ECE Block','Mechanical Block','Admin Block']} />
+            <Field label="Department" options={['CSE','ECE','ME','CE','IT','AE']} />
+            <div className="flex justify-end gap-2 pt-2">
+              <button onClick={() => setModal(false)} className={secondaryButton}>Cancel</button>
+              <button onClick={() => { setModal(false); setToast(true) }} className={primaryButton}>Register Beacon</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+      {toast && <Toast message="Beacon configuration updated successfully." />}
+    </AdminShell>
+  )
+}
+

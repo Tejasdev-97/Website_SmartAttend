@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import {
-  BarChart3, Bell, BookOpen, CalendarDays, ChevronDown,
-  ClipboardList, GraduationCap, LayoutDashboard, Menu,
+  Activity, BarChart3, Bell, BookOpen, CalendarDays, ChevronDown,
+  ClipboardList, GraduationCap, LayoutDashboard, Menu, Radio,
   RefreshCcw, Search, Settings, Shield, UserCog, Users, X,
 } from 'lucide-react'
 
@@ -36,6 +36,7 @@ export const C = {
 // ─── Navigation definition ────────────────────────────────────────────────────
 const primaryNav = [
   { label: 'Dashboard',         href: '/admin/dashboard',       icon: LayoutDashboard },
+  { label: 'Live Attendance',   href: '/admin/attendance',      icon: Activity        },
   { label: 'Students',          href: '/admin/students',         icon: GraduationCap   },
   { label: 'Faculty',           href: '/admin/faculty',          icon: Users            },
   { label: 'Academic Master',   href: '/admin/academic-master',  icon: BookOpen         },
@@ -44,12 +45,13 @@ const primaryNav = [
 ]
 
 const moreNav = [
-  { label: 'Bulk Update',        href: '/admin/bulk-update',          icon: RefreshCcw   },
-  { label: 'Users & Roles',      href: '/admin/users',                icon: UserCog      },
-  { label: 'Audit Logs',         href: '/admin/audit-logs',           icon: ClipboardList},
-  { label: 'Settings',           href: '/admin/settings',             icon: Settings     },
-  { label: 'Timetable Import',   href: '/admin/timetable/import',     icon: CalendarDays },
-  { label: 'Timetable Publish',  href: '/admin/timetable/publish',    icon: CalendarDays },
+  { label: 'BLE Beacons & Devices', href: '/admin/devices',          icon: Radio        },
+  { label: 'Bulk Update',           href: '/admin/bulk-update',      icon: RefreshCcw   },
+  { label: 'Users & Roles',         href: '/admin/users',            icon: UserCog      },
+  { label: 'Audit Logs',            href: '/admin/audit-logs',       icon: ClipboardList},
+  { label: 'Settings',              href: '/admin/settings',         icon: Settings     },
+  { label: 'Timetable Import',      href: '/admin/timetable/import', icon: CalendarDays },
+  { label: 'Timetable Publish',     href: '/admin/timetable/publish',icon: CalendarDays },
 ]
 
 // ─── AdminShell ───────────────────────────────────────────────────────────────
