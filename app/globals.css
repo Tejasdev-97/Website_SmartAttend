@@ -84,13 +84,20 @@
 
 /* ── Base ──────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { @apply border-border; }
-html { background: #F7FBFF; scroll-behavior: smooth; }
+html {
+  background: #F7FBFF;
+  scroll-behavior: smooth;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 14px;
   line-height: 1.5;
   color: #071B49;
+  max-width: 100vw;
+  overflow-x: hidden;
   @apply bg-background antialiased;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;

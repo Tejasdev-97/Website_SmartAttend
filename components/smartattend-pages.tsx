@@ -733,9 +733,9 @@ export function CreateStudentPage() {
         </div>
 
         {/* Single student form — two columns */}
-        <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+        <div className="grid gap-5 lg:grid-cols-[1fr_360px] min-w-0">
           {/* Left — personal + academic */}
-          <div className="space-y-5">
+          <div className="space-y-5 min-w-0">
             <Panel title="Personal Information">
               <div className="grid gap-4 p-5 sm:grid-cols-2">
                 {([['name','Full Name',true],['usn','USN',true],['gender','Gender',true],['mobile','Mobile Number',false],['email','Email (Optional)',false]] as [string,string,boolean][]).map(([k,l,req]) => (

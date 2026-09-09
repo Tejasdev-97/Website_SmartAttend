@@ -455,9 +455,9 @@ export function ReportsPage() {
           })}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px] min-w-0">
           {/* Popular reports */}
-          <Panel title="Popular Reports">
+          <Panel title="Popular Reports" className="min-w-0">
             <div className="divide-y" style={{ borderColor: C.border }}>
               {reportTypes.map(r => {
                 const Icon = r.icon
@@ -575,10 +575,10 @@ export function SettingsPage() {
           description="Configure the system as per your institution's requirements."
         />
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 min-w-0">
           {/* Left sidebar */}
           <div
-            className="w-56 shrink-0 rounded-xl bg-white self-start"
+            className="w-full lg:w-56 shrink-0 rounded-xl bg-white self-start"
             style={{ border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(7,27,73,0.05)' }}
           >
             <div className="p-3 space-y-0.5">
@@ -772,7 +772,7 @@ export function TimetablePublishPage() {
           }
         />
 
-        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[320px_1fr] min-w-0">
           {/* Left — Publish summary */}
           <div className="space-y-4">
             <Panel title="Publish Summary">

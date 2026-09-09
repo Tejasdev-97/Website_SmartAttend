@@ -69,17 +69,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const isMoreActive = moreNav.some(n => isActive(n.href))
 
   return (
-    <div className="min-h-screen" style={{ background: C.pageBg }}>
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden" style={{ background: C.pageBg }}>
 
       {/* ── Top Navigation Bar ───────────────────────────────────────────── */}
       <header
         className="sticky top-0 z-40 w-full bg-white"
         style={{ borderBottom: `1px solid ${C.border}`, boxShadow: '0 1px 0 #D9E4F2' }}
       >
-        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-5 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-[1440px] w-full items-center justify-between gap-2 xl:gap-4 px-4 sm:px-6 lg:px-8">
 
           {/* Logo */}
-          <Link href="/admin/dashboard" className="flex shrink-0 items-center gap-2.5">
+          <Link href="/admin/dashboard" className="flex shrink-0 items-center gap-2">
             <div
               className="flex size-8 items-center justify-center rounded-lg"
               style={{ background: C.blue }}
@@ -87,24 +87,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Shield className="size-4 text-white" />
             </div>
             <div>
-              <p className="text-[15px] font-bold leading-tight" style={{ color: C.navy }}>
+              <p className="text-[14.5px] font-bold leading-tight" style={{ color: C.navy }}>
                 Smart<span style={{ color: C.blue }}>Attend</span>
               </p>
-              <p className="hidden sm:block text-[10px] font-semibold tracking-widest uppercase" style={{ color: C.textSecondary }}>
+              <p className="hidden sm:block text-[9.5px] font-semibold tracking-wider uppercase" style={{ color: C.textSecondary }}>
                 ABC Engineering College
               </p>
             </div>
           </Link>
 
           {/* Primary nav — desktop */}
-          <nav className="hidden lg:flex items-center justify-center gap-1.5 xl:gap-2">
+          <nav className="hidden lg:flex items-center justify-center gap-1 xl:gap-1.5 min-w-0">
             {primaryNav.map(item => {
               const active = isActive(item.href)
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors whitespace-nowrap"
+                  className="relative flex items-center gap-1 px-2 xl:px-3 py-1.5 rounded-lg text-[12.5px] xl:text-[13.5px] font-medium transition-colors whitespace-nowrap"
                   style={{
                     color:      active ? C.blue   : C.navy,
                     background: active ? C.blueLight : 'transparent',
@@ -116,7 +116,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   {item.label}
                   {active && (
                     <span
-                      className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full"
+                      className="absolute -bottom-px left-2 right-2 h-0.5 rounded-full"
                       style={{ background: C.blue }}
                     />
                   )}
@@ -128,7 +128,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="relative">
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="flex items-center gap-1 px-3 py-2 rounded-lg text-[13.5px] transition-colors whitespace-nowrap"
+                className="flex items-center gap-1 px-2 xl:px-3 py-1.5 rounded-lg text-[12.5px] xl:text-[13.5px] transition-colors whitespace-nowrap"
                 style={{
                   color:      isMoreActive ? C.blue      : C.navy,
                   background: isMoreActive ? C.blueLight : 'transparent',
@@ -142,7 +142,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 />
                 {isMoreActive && (
                   <span
-                    className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full"
+                    className="absolute -bottom-px left-2 right-2 h-0.5 rounded-full"
                     style={{ background: C.blue }}
                   />
                 )}
@@ -184,17 +184,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Right section */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             {/* Search */}
             <div
-              className="hidden md:flex items-center gap-2 h-9 rounded-lg px-3 w-40 lg:w-48 xl:w-56"
+              className="hidden md:flex items-center gap-2 h-9 rounded-lg px-2.5 w-28 lg:w-36 xl:w-48 shrink-0"
               style={{ border: `1px solid ${C.border}`, background: C.blueFaint }}
             >
               <Search className="size-3.5 shrink-0" style={{ color: C.textTertiary }} />
               <input
                 aria-label="Search"
                 placeholder="Search..."
-                className="w-full bg-transparent text-[13px] outline-none"
+                className="w-full bg-transparent text-[12.5px] outline-none"
                 style={{ color: C.textPrimary }}
               />
             </div>
@@ -257,12 +257,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-[#F5F9FF]"
               >
                 <div
-                  className="flex size-8 items-center justify-center rounded-full text-xs font-bold text-white"
+                  className="flex size-8 items-center justify-center rounded-full text-xs font-bold text-white shrink-0"
                   style={{ background: C.blue }}
                 >
                   AK
                 </div>
-                <div className="hidden sm:block text-left">
+                <div className="hidden xl:block text-left">
                   <p className="text-[12.5px] font-semibold leading-tight" style={{ color: C.navy }}>
                     Anita Kulkarni
                   </p>
@@ -375,7 +375,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* ── Page ─────────────────────────────────────────────────────────────── */}
-      <main>{children}</main>
+      <main className="w-full max-w-full overflow-x-hidden">{children}</main>
     </div>
   )
 }
@@ -384,7 +384,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
 export function AdminContent({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-[1440px] px-5 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-[1440px] w-full px-4 sm:px-6 lg:px-8 py-8 min-w-0 overflow-x-hidden">
       {children}
     </div>
   )
@@ -402,18 +402,18 @@ export function PageHeader({
   eyebrow?: string
 }) {
   return (
-    <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-      <div>
+    <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-start w-full">
+      <div className="min-w-0 flex-1">
         {eyebrow && (
           <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest" style={{ color: C.blue }}>
             {eyebrow}
           </p>
         )}
-        <h1 className="text-[26px] font-bold leading-tight" style={{ color: C.navy }}>
+        <h1 className="text-[24px] sm:text-[26px] font-bold leading-tight" style={{ color: C.navy }}>
           {title}
         </h1>
         {description && (
-          <p className="mt-1.5 text-[14px]" style={{ color: C.textSecondary }}>
+          <p className="mt-1.5 text-[13.5px] sm:text-[14px]" style={{ color: C.textSecondary }}>
             {description}
           </p>
         )}
@@ -442,7 +442,7 @@ export function Panel({
 }) {
   return (
     <section
-      className={`rounded-xl bg-white ${className}`}
+      className={`rounded-xl bg-white w-full max-w-full overflow-hidden ${className}`}
       style={{ border: `1px solid ${C.border}`, boxShadow: '0 1px 4px rgba(7,27,73,0.06), 0 4px 12px rgba(7,27,73,0.04)' }}
     >
       {title && (

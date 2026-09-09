@@ -154,10 +154,10 @@ export function AcademicMasterPage() {
           description="Manage departments, subjects, sections and rooms."
         />
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 min-w-0">
           {/* Left sidebar nav */}
           <div
-            className="w-52 shrink-0 rounded-xl bg-white self-start"
+            className="w-full lg:w-52 shrink-0 rounded-xl bg-white self-start"
             style={{ border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(7,27,73,0.05)' }}
           >
             <div className="p-3 space-y-0.5">
@@ -552,9 +552,9 @@ export function TimetableImportPage() {
           }
         />
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_280px] min-w-0">
           {/* Upload area */}
-          <div className="space-y-5">
+          <div className="space-y-5 min-w-0">
             {/* Dropzone */}
             <Panel>
               <div
@@ -772,9 +772,9 @@ export function BulkAcademicUpdatePage() {
           ))}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px] min-w-0">
           {/* Left — select students */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             <Panel title="Filter Current Students">
               <div className="grid gap-4 p-5 sm:grid-cols-2">
                 <Field label="Department"  value="CSE"    options={['CSE','ECE','IT','ME']} />
@@ -933,7 +933,7 @@ export function StudentProfilePage() {
           }
         />
 
-        <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[300px_1fr] min-w-0">
           {/* Left identity card */}
           <div className="space-y-4">
             <Panel>
@@ -980,7 +980,7 @@ export function StudentProfilePage() {
           </div>
 
           {/* Right tabbed area */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             {/* Tabs */}
             <div className="flex rounded-xl bg-white p-1" style={{ border: `1px solid ${C.border}` }}>
               {tabs.map(tab => (
@@ -1308,7 +1308,7 @@ export function FacultyProfilePage() {
           }
         />
 
-        <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[300px_1fr] min-w-0">
           {/* Identity card */}
           <div className="space-y-4">
             <Panel>
@@ -1349,7 +1349,7 @@ export function FacultyProfilePage() {
           </div>
 
           {/* Right — teaching workload & schedule */}
-          <div className="space-y-5">
+          <div className="space-y-5 min-w-0">
             <Panel title="Assigned Subjects & Sections">
               <div className="overflow-x-auto">
                 <table className="w-full text-left min-w-[600px]">
