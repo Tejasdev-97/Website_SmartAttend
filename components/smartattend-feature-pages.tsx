@@ -165,7 +165,7 @@ export function AcademicMasterPage() {
               <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
                 <div>
                   <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Departments</h2>
-                  <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>
+                  <p className="mt-0.5 text-[13px]" style={{ color: C.textSecondary }}>
                     Total: <span className="font-semibold" style={{ color: C.navy }}>6 Departments</span>
                   </p>
                 </div>
@@ -182,7 +182,7 @@ export function AcademicMasterPage() {
                         <th
                           key={h}
                           className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
-                          style={{ color: C.textSecondary, textAlign: i === 6 ? 'right' : 'left' }}
+                          style={{ color: C.navy, textAlign: i === 6 ? 'right' : 'left' }}
                         >
                           {h}
                         </th>
@@ -303,7 +303,7 @@ export function TimetablePage() {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <StatusBadge tone="orange">Draft</StatusBadge>
-            <span className="text-[12.5px]" style={{ color: C.textTertiary }}>
+            <span className="text-[12.5px] font-medium" style={{ color: C.textSecondary }}>
               Last Updated: 20 May 2024, 10:30 AM
             </span>
           </div>
@@ -325,7 +325,7 @@ export function TimetablePage() {
                     <th
                       key={h}
                       className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
-                      style={{ color: C.textSecondary, textAlign: i === 5 ? 'right' : 'left' }}
+                      style={{ color: C.navy, textAlign: i === 5 ? 'right' : 'left' }}
                     >
                       {h}
                     </th>
@@ -377,7 +377,7 @@ export function TimetablePage() {
           </div>
 
           <div className="flex items-center justify-between px-5 py-3.5" style={{ borderTop: `1px solid ${C.border}` }}>
-            <p className="text-[13px]" style={{ color: C.textTertiary }}>Showing 4 of 48 entries</p>
+            <p className="text-[13px]" style={{ color: C.textSecondary }}>Showing 4 of 48 entries</p>
             <div className="flex gap-1">
               {[1, 2, 3, '…', 6].map((p, i) => (
                 <button

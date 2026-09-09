@@ -359,7 +359,7 @@ export function DashboardPage() {
             </p>
           </div>
           <div className="flex flex-col items-end shrink-0">
-            <p className="text-[13px] font-medium" style={{ color: C.textTertiary }}>{dateStr}</p>
+            <p className="text-[13px] font-medium" style={{ color: C.textSecondary }}>{dateStr}</p>
             <div className="mt-2 flex items-center gap-1.5">
               <Shield className="size-4" style={{ color: C.blue }} />
               <span className="text-[12px] font-medium" style={{ color: C.textSecondary }}>Super Admin</span>
@@ -387,7 +387,7 @@ export function DashboardPage() {
                   <div>
                     <p
                       className="text-[12.5px] font-medium"
-                      style={{ color: item.accent ? 'rgba(255,255,255,0.75)' : C.textTertiary }}
+                      style={{ color: item.accent ? 'rgba(255,255,255,0.85)' : C.textSecondary }}
                     >
                       {item.label}
                     </p>
@@ -399,7 +399,7 @@ export function DashboardPage() {
                     </p>
                     <p
                       className="mt-1.5 text-[12px]"
-                      style={{ color: item.accent ? 'rgba(255,255,255,0.60)' : C.textTertiary }}
+                      style={{ color: item.accent ? 'rgba(255,255,255,0.75)' : C.textSecondary }}
                     >
                       {item.sub}
                     </p>
@@ -446,7 +446,7 @@ export function DashboardPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>{action.title}</p>
-                    <p className="mt-0.5 text-[12px]" style={{ color: C.textTertiary }}>{action.desc}</p>
+                    <p className="mt-0.5 text-[12px]" style={{ color: C.textSecondary }}>{action.desc}</p>
                   </div>
                 </Link>
               )
@@ -456,7 +456,7 @@ export function DashboardPage() {
 
         {/* Quote footer */}
         <div className="mt-8 flex items-center justify-center">
-          <p className="text-[13px] font-medium italic" style={{ color: C.textTertiary }}>
+          <p className="text-[13px] font-medium" style={{ color: C.textSecondary }}>
             &ldquo;Better Attendance. A Stronger Tomorrow.&rdquo;
           </p>
         </div>
@@ -546,7 +546,7 @@ export function StudentsPage() {
           >
             <div>
               <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Student Directory</h2>
-              <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>
+              <p className="mt-0.5 text-[13px]" style={{ color: C.textSecondary }}>
                 Total: <span className="font-semibold" style={{ color: C.navy }}>2,856</span> students
               </p>
             </div>
@@ -561,7 +561,7 @@ export function StudentsPage() {
                     <th
                       key={h}
                       className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
-                      style={{ color: C.textSecondary, textAlign: i === 8 ? 'right' : 'left' }}
+                      style={{ color: C.navy, textAlign: i === 8 ? 'right' : 'left' }}
                     >
                       {h}
                     </th>
@@ -630,7 +630,7 @@ export function StudentsPage() {
             className="flex items-center justify-between px-5 py-3.5"
             style={{ borderTop: `1px solid ${C.border}` }}
           >
-            <p className="text-[13px]" style={{ color: C.textTertiary }}>
+            <p className="text-[13px]" style={{ color: C.textSecondary }}>
               Showing <span className="font-semibold" style={{ color: C.navy }}>{filtered.length}</span> of{' '}
               <span className="font-semibold" style={{ color: C.navy }}>2,856</span>
             </p>
@@ -655,7 +655,7 @@ export function StudentsPage() {
         {/* Info notice */}
         <div className="mt-4 flex items-start gap-3 rounded-xl p-4" style={{ background: C.blueLight, border: `1px solid #BFDBFE` }}>
           <Info className="mt-0.5 size-4 shrink-0" style={{ color: C.blue }} />
-          <p className="text-[13px]" style={{ color: C.textSecondary }}>
+          <p className="text-[13px] font-medium" style={{ color: C.textSecondary }}>
             Student accounts are created by Admin or Faculty. Students cannot self-register.
           </p>
         </div>
@@ -896,7 +896,7 @@ export function FacultyPage() {
           <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
             <div>
               <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Faculty Directory</h2>
-              <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>
+              <p className="mt-0.5 text-[13px]" style={{ color: C.textSecondary }}>
                 Total: <span className="font-semibold" style={{ color: C.navy }}>156</span> faculty members
               </p>
             </div>
@@ -910,7 +910,7 @@ export function FacultyPage() {
                     <th
                       key={h}
                       className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
-                      style={{ color: C.textSecondary, textAlign: i === 7 ? 'right' : 'left' }}
+                      style={{ color: C.navy, textAlign: i === 7 ? 'right' : 'left' }}
                     >
                       {h}
                     </th>
@@ -961,7 +961,7 @@ export function FacultyPage() {
           </div>
 
           <div className="flex items-center justify-between px-5 py-3.5" style={{ borderTop: `1px solid ${C.border}` }}>
-            <p className="text-[13px]" style={{ color: C.textTertiary }}>
+            <p className="text-[13px]" style={{ color: C.textSecondary }}>
               Showing <span className="font-semibold" style={{ color: C.navy }}>{filtered.length}</span> of{' '}
               <span className="font-semibold" style={{ color: C.navy }}>156</span>
             </p>

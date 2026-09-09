@@ -166,7 +166,7 @@ export function UsersRolesPage() {
               <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
                 <tr>
                   {['#','Name','Email','Role','Department','Status','Actions'].map((h, i) => (
-                    <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.textSecondary, textAlign: i === 6 ? 'right' : 'left' }}>
+                    <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy, textAlign: i === 6 ? 'right' : 'left' }}>
                       {h}
                     </th>
                   ))}
@@ -309,7 +309,7 @@ export function AuditLogsPage() {
         <Panel>
           <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
             <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Activity History</h2>
-            <span className="text-[13px]" style={{ color: C.textTertiary }}>
+            <span className="text-[13px] font-medium" style={{ color: C.textSecondary }}>
               {filtered.length} entries found
             </span>
           </div>
@@ -318,7 +318,7 @@ export function AuditLogsPage() {
               <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
                 <tr>
                   {['#','Date & Time','User','Action','Module','Details','IP Address'].map(h => (
-                    <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.textSecondary }}>{h}</th>
+                    <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -351,7 +351,7 @@ export function AuditLogsPage() {
             </table>
           </div>
           <div className="flex items-center justify-between px-5 py-3.5" style={{ borderTop: `1px solid ${C.border}` }}>
-            <p className="text-[13px]" style={{ color: C.textTertiary }}>
+            <p className="text-[13px]" style={{ color: C.textSecondary }}>
               Showing <span className="font-semibold" style={{ color: C.navy }}>{filtered.length}</span> of <span className="font-semibold" style={{ color: C.navy }}>248</span> entries
             </p>
             <div className="flex gap-1">
@@ -434,7 +434,7 @@ export function ReportsPage() {
               <div key={item.label} className="rounded-xl p-5" style={{ background: C.white, border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(7,27,73,0.05)' }}>
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-[12.5px] font-medium" style={{ color: C.textTertiary }}>{item.label}</p>
+                    <p className="text-[12.5px] font-medium" style={{ color: C.textSecondary }}>{item.label}</p>
                     <p className="mt-2 text-[32px] font-bold leading-none" style={{ color: C.navy }}>{item.value}</p>
                   </div>
                   <div className="flex size-10 items-center justify-center rounded-xl" style={{ background: C.blueLight }}>
@@ -459,7 +459,7 @@ export function ReportsPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>{r.title}</p>
-                      <p className="mt-0.5 text-[12.5px]" style={{ color: C.textTertiary }}>{r.desc}</p>
+                      <p className="mt-0.5 text-[12.5px]" style={{ color: C.textSecondary }}>{r.desc}</p>
                     </div>
                     <div className="flex shrink-0 gap-2">
                       <button onClick={() => setToast(`${r.title} (PDF)`)} className={`${secondaryButton} h-8 px-3 text-[12px]`}>
@@ -511,14 +511,14 @@ export function ReportsPage() {
               <div className="divide-y p-5 space-y-3" style={{ borderColor: C.border }}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[12.5px]" style={{ color: C.textTertiary }}>Highest Attendance</p>
+                    <p className="text-[12.5px] font-medium" style={{ color: C.textSecondary }}>Highest Attendance</p>
                     <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>Mathematics — CSE 3A</p>
                   </div>
                   <span className="text-[22px] font-bold" style={{ color: C.green }}>92%</span>
                 </div>
                 <div className="flex items-center justify-between pt-3">
                   <div>
-                    <p className="text-[12.5px]" style={{ color: C.textTertiary }}>Lowest Attendance</p>
+                    <p className="text-[12.5px] font-medium" style={{ color: C.textSecondary }}>Lowest Attendance</p>
                     <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>OS Lab — CSE 3B</p>
                   </div>
                   <span className="text-[22px] font-bold" style={{ color: C.red }}>68%</span>

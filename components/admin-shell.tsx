@@ -86,7 +86,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <p className="text-[15px] font-bold leading-tight" style={{ color: C.navy }}>
                 Smart<span style={{ color: C.blue }}>Attend</span>
               </p>
-              <p className="hidden sm:block text-[10px] font-medium tracking-widest uppercase" style={{ color: C.textTertiary }}>
+              <p className="hidden sm:block text-[10px] font-semibold tracking-widest uppercase" style={{ color: C.textSecondary }}>
                 ABC Engineering College
               </p>
             </div>
@@ -102,12 +102,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors"
                   style={{
-                    color:      active ? C.blue   : C.textSecondary,
+                    color:      active ? C.blue   : C.navy,
                     background: active ? C.blueLight : 'transparent',
                     fontWeight: active ? 600 : 500,
                   }}
-                  onMouseEnter={e => { if (!active) (e.currentTarget as HTMLAnchorElement).style.color = C.navy }}
-                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLAnchorElement).style.color = C.textSecondary }}
+                  onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLAnchorElement).style.color = C.blue; (e.currentTarget as HTMLAnchorElement).style.background = C.blueFaint } }}
+                  onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLAnchorElement).style.color = C.navy; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent' } }}
                 >
                   {item.label}
                   {active && (
@@ -126,7 +126,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 onClick={() => setMoreOpen(!moreOpen)}
                 className="flex items-center gap-1 px-3 py-2 rounded-lg text-[13.5px] transition-colors"
                 style={{
-                  color:      isMoreActive ? C.blue      : C.textSecondary,
+                  color:      isMoreActive ? C.blue      : C.navy,
                   background: isMoreActive ? C.blueLight : 'transparent',
                   fontWeight: isMoreActive ? 600 : 500,
                 }}
@@ -224,7 +224,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   <p className="text-[12.5px] font-semibold leading-tight" style={{ color: C.navy }}>
                     Anita Kulkarni
                   </p>
-                  <p className="text-[11px]" style={{ color: C.textTertiary }}>Super Admin</p>
+                  <p className="text-[11px] font-medium" style={{ color: C.textSecondary }}>Super Admin</p>
                 </div>
                 <ChevronDown className="hidden sm:block size-3.5" style={{ color: C.textTertiary }} />
               </button>
@@ -400,7 +400,7 @@ export function Panel({
   return (
     <section
       className={`rounded-xl bg-white ${className}`}
-      style={{ border: `1px solid ${C.border}`, boxShadow: '0 2px 10px rgba(7,27,73,0.05)' }}
+      style={{ border: `1px solid ${C.border}`, boxShadow: '0 1px 4px rgba(7,27,73,0.06), 0 4px 12px rgba(7,27,73,0.04)' }}
     >
       {title && (
         <div
@@ -409,7 +409,7 @@ export function Panel({
         >
           <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>{title}</h2>
           {description && (
-            <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>{description}</p>
+            <p className="mt-0.5 text-[13px]" style={{ color: C.textSecondary }}>{description}</p>
           )}
         </div>
       )}

@@ -53,7 +53,7 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 
   /* Shadows */
-  --shadow-card:    0 1px 3px rgba(7, 27, 73, 0.05), 0 1px 2px rgba(7, 27, 73, 0.04);
+  --shadow-card:    0 1px 4px rgba(7, 27, 73, 0.06), 0 4px 12px rgba(7, 27, 73, 0.04);
   --shadow-panel:   0 2px 10px rgba(7, 27, 73, 0.07), 0 1px 3px rgba(7, 27, 73, 0.05);
   --shadow-modal:   0 20px 60px rgba(7, 27, 73, 0.16), 0 4px 16px rgba(7, 27, 73, 0.10);
   --shadow-nav:     0 1px 0 #D9E4F2;
@@ -61,7 +61,6 @@
 
 :root {
   color-scheme: light;
-  /* Mapped to sa- tokens */
   --background:            #F7FBFF;
   --foreground:            #071B49;
   --card:                  #ffffff;
@@ -89,7 +88,10 @@ html { background: #F7FBFF; scroll-behavior: smooth; }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  @apply bg-background text-foreground antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #071B49;
+  @apply bg-background antialiased;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -107,16 +109,16 @@ select:focus-visible {
 
 /* ── SmartAttend Utility Classes ───────────────────────────────────────────── */
 
-/* Input standard */
+/* Input standard — 44px height per spec */
 .sa-input {
-  @apply h-11 w-full rounded-lg border border-[#D9E4F2] bg-white px-3 text-sm text-[#071B49];
+  @apply h-11 w-full rounded-lg border border-[#D9E4F2] bg-white px-3.5 text-[14px] text-[#071B49];
   @apply outline-none transition-all placeholder:text-[#8EA5C0];
   @apply focus:border-[#0B5CFF] focus:ring-2 focus:ring-[#0B5CFF]/10;
 }
 
 /* Select standard */
 .sa-select {
-  @apply h-11 rounded-lg border border-[#D9E4F2] bg-white px-3 text-sm text-[#071B49];
+  @apply h-11 rounded-lg border border-[#D9E4F2] bg-white px-3.5 text-[14px] text-[#071B49];
   @apply outline-none focus:border-[#0B5CFF] appearance-none;
 }
 
@@ -125,12 +127,12 @@ select:focus-visible {
   background: #ffffff;
   border: 1px solid #D9E4F2;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(7, 27, 73, 0.05);
+  box-shadow: 0 1px 4px rgba(7, 27, 73, 0.06), 0 4px 12px rgba(7, 27, 73, 0.04);
 }
 
-/* Table header */
+/* Table header — dark navy per spec */
 .sa-th {
-  @apply px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#243B64] bg-[#F4F8FD];
+  @apply px-5 py-3 text-left text-[11.5px] font-semibold uppercase tracking-wide text-[#071B49] bg-[#F4F8FD];
 }
 
 /* Table cell */
@@ -145,7 +147,7 @@ select:focus-visible {
 
 /* Info notice */
 .sa-notice {
-  @apply flex items-start gap-3 rounded-xl border border-blue-100 bg-[#EAF3FF] p-4 text-sm text-[#243B64];
+  @apply flex items-start gap-3 rounded-xl border border-blue-100 bg-[#EAF3FF] p-4 text-sm font-medium text-[#243B64];
 }
 
 /* Section label */
