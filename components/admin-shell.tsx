@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import {
   BarChart3, Bell, BookOpen, CalendarDays, ChevronDown,
@@ -54,10 +54,12 @@ const moreNav = [
 
 // ─── AdminShell ───────────────────────────────────────────────────────────────
 export function AdminShell({ children }: { children: React.ReactNode }) {
+  const router   = useRouter()
   const pathname = usePathname()
   const [mobileOpen,  setMobileOpen]  = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [moreOpen,    setMoreOpen]    = useState(false)
+  const [notifOpen,   setNotifOpen]   = useState(false)
 
   const isActive = (href: string) =>
     pathname === href || (href !== '/admin/dashboard' && pathname.startsWith(href))
@@ -72,10 +74,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         className="sticky top-0 z-40 w-full bg-white"
         style={{ borderBottom: `1px solid ${C.border}`, boxShadow: '0 1px 0 #D9E4F2' }}
       >
-        <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-5 px-5 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-5 lg:px-8">
 
           {/* Logo */}
-          <Link href="/admin/dashboard" className="flex shrink-0 items-center gap-2.5 mr-3">
+          <Link href="/admin/dashboard" className="flex shrink-0 items-center gap-2.5">
             <div
               className="flex size-8 items-center justify-center rounded-lg"
               style={{ background: C.blue }}
@@ -93,14 +95,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           {/* Primary nav — desktop */}
-          <nav className="hidden lg:flex items-center gap-0.5 flex-1">
+          <nav className="hidden lg:flex items-center justify-center gap-1.5 xl:gap-2">
             {primaryNav.map(item => {
               const active = isActive(item.href)
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors"
+                  className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors whitespace-nowrap"
                   style={{
                     color:      active ? C.blue   : C.navy,
                     background: active ? C.blueLight : 'transparent',
@@ -124,7 +126,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="relative">
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="flex items-center gap-1 px-3 py-2 rounded-lg text-[13.5px] transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-[13.5px] transition-colors whitespace-nowrap"
                 style={{
                   color:      isMoreActive ? C.blue      : C.navy,
                   background: isMoreActive ? C.blueLight : 'transparent',
@@ -180,10 +182,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Right section */}
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             {/* Search */}
             <div
-              className="hidden md:flex items-center gap-2 h-9 rounded-lg px-3 w-44 lg:w-52"
+              className="hidden md:flex items-center gap-2 h-9 rounded-lg px-3 w-40 lg:w-48 xl:w-56"
               style={{ border: `1px solid ${C.border}`, background: C.blueFaint }}
             >
               <Search className="size-3.5 shrink-0" style={{ color: C.textTertiary }} />
@@ -196,17 +198,55 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Notifications */}
-            <button
-              aria-label="Notifications"
-              className="relative flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-[#EAF3FF]"
-              style={{ color: C.textTertiary }}
-            >
-              <Bell className="size-[18px]" />
-              <span
-                className="absolute right-1.5 top-1.5 size-2 rounded-full ring-2 ring-white"
-                style={{ background: C.red }}
-              />
-            </button>
+            <div className="relative">
+              <button
+                aria-label="Notifications"
+                onClick={() => setNotifOpen(!notifOpen)}
+                className="relative flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-[#EAF3FF]"
+                style={{ color: C.textTertiary }}
+              >
+                <Bell className="size-[18px]" />
+                <span
+                  className="absolute right-1.5 top-1.5 size-2 rounded-full ring-2 ring-white"
+                  style={{ background: C.red }}
+                />
+              </button>
+              {notifOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setNotifOpen(false)} />
+                  <div
+                    className="absolute right-0 top-full mt-2 z-20 w-80 rounded-xl p-3"
+                    style={{
+                      background: C.white,
+                      border: `1px solid ${C.border}`,
+                      boxShadow: '0 8px 32px rgba(7,27,73,0.12)',
+                    }}
+                  >
+                    <div className="flex items-center justify-between pb-2 mb-2" style={{ borderBottom: `1px solid ${C.border}` }}>
+                      <p className="text-[13.5px] font-semibold" style={{ color: C.navy }}>Notifications</p>
+                      <span className="rounded-full px-2 py-0.5 text-[11px] font-semibold" style={{ background: C.blueLight, color: C.blue }}>3 New</span>
+                    </div>
+                    <div className="space-y-2 text-[12.5px]">
+                      <div className="rounded-lg p-2.5 hover:bg-[#F5F9FF] cursor-pointer">
+                        <p className="font-semibold" style={{ color: C.navy }}>Timetable Published</p>
+                        <p style={{ color: C.textSecondary }}>CSE Sem 5 Section 3A timetable is now live.</p>
+                        <p className="mt-1 text-[10.5px]" style={{ color: C.textTertiary }}>10 mins ago</p>
+                      </div>
+                      <div className="rounded-lg p-2.5 hover:bg-[#F5F9FF] cursor-pointer">
+                        <p className="font-semibold" style={{ color: C.navy }}>Low Attendance Alert</p>
+                        <p style={{ color: C.textSecondary }}>12 students fell below 75% threshold in ME Dept.</p>
+                        <p className="mt-1 text-[10.5px]" style={{ color: C.textTertiary }}>1 hour ago</p>
+                      </div>
+                      <div className="rounded-lg p-2.5 hover:bg-[#F5F9FF] cursor-pointer">
+                        <p className="font-semibold" style={{ color: C.navy }}>System Backup Complete</p>
+                        <p style={{ color: C.textSecondary }}>Weekly database backup completed successfully.</p>
+                        <p className="mt-1 text-[10.5px]" style={{ color: C.textTertiary }}>Yesterday</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
             {/* Profile */}
             <div className="relative">
@@ -250,6 +290,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                     </Link>
                     <div className="my-1 h-px" style={{ background: C.border }} />
                     <button
+                      onClick={() => { setProfileOpen(false); router.push('/admin/login') }}
                       className="w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-red-50"
                       style={{ color: C.red }}
                     >

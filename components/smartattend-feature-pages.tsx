@@ -116,11 +116,35 @@ const departments = [
   { code: 'AE',  name: 'Artificial Intelligence',        hod: 'Dr. Rajesh Mehta',   subjects: 14, status: 'Active' },
 ]
 
+const masterSubjects = [
+  { code: 'CS301', name: 'Data Structures',       dept: 'CSE', sem: '3', type: 'Theory', status: 'Active' },
+  { code: 'CS302', name: 'Digital Logic',         dept: 'CSE', sem: '3', type: 'Theory', status: 'Active' },
+  { code: 'CS304', name: 'Operating Systems Lab', dept: 'CSE', sem: '5', type: 'Lab',    status: 'Active' },
+  { code: 'EC201', name: 'Signals & Systems',     dept: 'ECE', sem: '4', type: 'Theory', status: 'Active' },
+  { code: 'MA303', name: 'Engineering Maths III', dept: 'ALL', sem: '3', type: 'Theory', status: 'Active' },
+]
+
+const masterSections = [
+  { name: 'CSE 3A', dept: 'CSE', year: '3rd Year', sem: '5', students: 68, status: 'Active' },
+  { name: 'CSE 3B', dept: 'CSE', year: '3rd Year', sem: '5', students: 66, status: 'Active' },
+  { name: 'ECE 2A', dept: 'ECE', year: '2nd Year', sem: '3', students: 62, status: 'Active' },
+  { name: 'IT 3A',  dept: 'IT',  year: '3rd Year', sem: '5', students: 58, status: 'Active' },
+  { name: 'ME 4A',  dept: 'ME',  year: '4th Year', sem: '7', students: 54, status: 'Active' },
+]
+
+const masterRooms = [
+  { number: 'Room 201', building: 'Main Block', capacity: 70, type: 'Lecture Hall', status: 'Available' },
+  { number: 'Room 203', building: 'Main Block', capacity: 70, type: 'Lecture Hall', status: 'Available' },
+  { number: 'Lab 2',    building: 'CS Block',   capacity: 40, type: 'Computer Lab', status: 'Occupied' },
+  { number: 'Room 305', building: 'ECE Block',  capacity: 65, type: 'Lecture Hall', status: 'Available' },
+  { number: 'Auditorium', building: 'Admin Block', capacity: 300, type: 'Auditorium', status: 'Available' },
+]
+
 export function AcademicMasterPage() {
   const [activeNav, setActiveNav] = useState('departments')
   const [modal, setModal]         = useState<'add' | 'edit' | null>(null)
   const [toast, setToast]         = useState(false)
-  const [editRow, setEditRow]     = useState(departments[0])
+  const [editRow, setEditRow]     = useState<any>(departments[0])
 
   return (
     <AdminShell>
@@ -164,65 +188,143 @@ export function AcademicMasterPage() {
             <Panel>
               <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
                 <div>
-                  <h2 className="text-[15px] font-semibold" style={{ color: C.navy }}>Departments</h2>
+                  <h2 className="text-[15px] font-semibold capitalize" style={{ color: C.navy }}>{activeNav}</h2>
                   <p className="mt-0.5 text-[13px]" style={{ color: C.textSecondary }}>
-                    Total: <span className="font-semibold" style={{ color: C.navy }}>6 Departments</span>
+                    Total: <span className="font-semibold" style={{ color: C.navy }}>
+                      {activeNav === 'departments' ? '6 Departments' :
+                       activeNav === 'subjects' ? '5 Subjects' :
+                       activeNav === 'sections' ? '5 Sections' : '5 Rooms'}
+                    </span>
                   </p>
                 </div>
                 <button onClick={() => setModal('add')} className={primaryButton}>
-                  <Plus className="size-4" /> Add Department
+                  <Plus className="size-4" /> Add {activeNav.slice(0, -1)}
                 </button>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px] text-left">
-                  <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
-                    <tr>
-                      {['#','Dept. Code','Department Name','HOD','Total Subjects','Status','Actions'].map((h, i) => (
-                        <th
-                          key={h}
-                          className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide"
-                          style={{ color: C.navy, textAlign: i === 6 ? 'right' : 'left' }}
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {departments.map((dept, i) => (
-                      <tr
-                        key={dept.code}
-                        style={{ borderBottom: `1px solid ${C.border}` }}
-                        onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
-                        onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
-                      >
-                        <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
-                        <td className="px-5 py-[14px]">
-                          <span
-                            className="rounded-lg px-2.5 py-1 text-[12px] font-bold"
-                            style={{ background: C.blueLight, color: C.blue }}
-                          >
-                            {dept.code}
-                          </span>
-                        </td>
-                        <td className="px-5 py-[14px] text-[13.5px] font-medium" style={{ color: C.navy }}>{dept.name}</td>
-                        <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{dept.hod}</td>
-                        <td className="px-5 py-[14px] text-[13px] font-medium" style={{ color: C.navy }}>{dept.subjects}</td>
-                        <td className="px-5 py-[14px]"><StatusBadge tone="green">{dept.status}</StatusBadge></td>
-                        <td className="px-5 py-[14px] text-right">
-                          <button
-                            onClick={() => { setEditRow(dept); setModal('edit') }}
-                            className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium transition-colors hover:bg-[#EAF3FF]"
-                            style={{ borderColor: C.border, color: C.blue }}
-                          >
-                            <Edit3 className="size-3.5" /> Edit
-                          </button>
-                        </td>
+                {activeNav === 'departments' && (
+                  <table className="w-full min-w-[700px] text-left">
+                    <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                      <tr>
+                        {['#','Dept. Code','Department Name','HOD','Total Subjects','Status','Actions'].map((h, i) => (
+                          <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy, textAlign: i === 6 ? 'right' : 'left' }}>{h}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {departments.map((dept, i) => (
+                        <tr key={dept.code} style={{ borderBottom: `1px solid ${C.border}` }}
+                          onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = C.blueFaint}
+                          onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                        >
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                          <td className="px-5 py-[14px]">
+                            <span className="rounded-lg px-2.5 py-1 text-[12px] font-bold" style={{ background: C.blueLight, color: C.blue }}>{dept.code}</span>
+                          </td>
+                          <td className="px-5 py-[14px] text-[13.5px] font-medium" style={{ color: C.navy }}>{dept.name}</td>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{dept.hod}</td>
+                          <td className="px-5 py-[14px] text-[13px] font-medium" style={{ color: C.navy }}>{dept.subjects}</td>
+                          <td className="px-5 py-[14px]"><StatusBadge tone="green">{dept.status}</StatusBadge></td>
+                          <td className="px-5 py-[14px] text-right">
+                            <button onClick={() => { setEditRow(dept); setModal('edit') }} className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-[#EAF3FF]" style={{ borderColor: C.border, color: C.blue }}>
+                              <Edit3 className="size-3.5" /> Edit
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+
+                {activeNav === 'subjects' && (
+                  <table className="w-full min-w-[700px] text-left">
+                    <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                      <tr>
+                        {['#','Code','Subject Name','Dept.','Semester','Type','Status','Actions'].map((h, i) => (
+                          <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy, textAlign: i === 7 ? 'right' : 'left' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {masterSubjects.map((s, i) => (
+                        <tr key={s.code} style={{ borderBottom: `1px solid ${C.border}` }}>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                          <td className="px-5 py-[14px] font-bold" style={{ color: C.blue }}>{s.code}</td>
+                          <td className="px-5 py-[14px] font-medium" style={{ color: C.navy }}>{s.name}</td>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{s.dept}</td>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>Sem {s.sem}</td>
+                          <td className="px-5 py-[14px]"><StatusBadge tone={s.type === 'Lab' ? 'purple' : 'blue'}>{s.type}</StatusBadge></td>
+                          <td className="px-5 py-[14px]"><StatusBadge tone="green">{s.status}</StatusBadge></td>
+                          <td className="px-5 py-[14px] text-right">
+                            <button onClick={() => { setEditRow(s); setModal('edit') }} className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-[#EAF3FF]" style={{ borderColor: C.border, color: C.blue }}>
+                              <Edit3 className="size-3.5" /> Edit
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+
+                {activeNav === 'sections' && (
+                  <table className="w-full min-w-[700px] text-left">
+                    <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                      <tr>
+                        {['#','Section Name','Dept.','Year','Semester','Students','Status','Actions'].map((h, i) => (
+                          <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy, textAlign: i === 7 ? 'right' : 'left' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {masterSections.map((sec, i) => (
+                        <tr key={sec.name} style={{ borderBottom: `1px solid ${C.border}` }}>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                          <td className="px-5 py-[14px] font-bold" style={{ color: C.navy }}>{sec.name}</td>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{sec.dept}</td>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{sec.year}</td>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>Sem {sec.sem}</td>
+                          <td className="px-5 py-[14px] font-semibold" style={{ color: C.navy }}>{sec.students}</td>
+                          <td className="px-5 py-[14px]"><StatusBadge tone="green">{sec.status}</StatusBadge></td>
+                          <td className="px-5 py-[14px] text-right">
+                            <button onClick={() => { setEditRow(sec); setModal('edit') }} className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-[#EAF3FF]" style={{ borderColor: C.border, color: C.blue }}>
+                              <Edit3 className="size-3.5" /> Edit
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+
+                {activeNav === 'rooms' && (
+                  <table className="w-full min-w-[700px] text-left">
+                    <thead style={{ background: '#F4F8FD', borderBottom: `1px solid ${C.border}` }}>
+                      <tr>
+                        {['#','Room No.','Building','Capacity','Type','Status','Actions'].map((h, i) => (
+                          <th key={h} className="px-5 py-3 text-[11.5px] font-semibold uppercase tracking-wide" style={{ color: C.navy, textAlign: i === 6 ? 'right' : 'left' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {masterRooms.map((rm, i) => (
+                        <tr key={rm.number} style={{ borderBottom: `1px solid ${C.border}` }}>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textTertiary }}>{i + 1}</td>
+                          <td className="px-5 py-[14px] font-bold" style={{ color: C.navy }}>{rm.number}</td>
+                          <td className="px-5 py-[14px] text-[13px]" style={{ color: C.textSecondary }}>{rm.building}</td>
+                          <td className="px-5 py-[14px] font-semibold" style={{ color: C.navy }}>{rm.capacity} seats</td>
+                          <td className="px-5 py-[14px] text-[13px]">{rm.type}</td>
+                          <td className="px-5 py-[14px]"><StatusBadge tone={rm.status === 'Available' ? 'green' : 'orange'}>{rm.status}</StatusBadge></td>
+                          <td className="px-5 py-[14px] text-right">
+                            <button onClick={() => { setEditRow(rm); setModal('edit') }} className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-[#EAF3FF]" style={{ borderColor: C.border, color: C.blue }}>
+                              <Edit3 className="size-3.5" /> Edit
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </Panel>
           </div>
@@ -231,14 +333,13 @@ export function AcademicMasterPage() {
 
       {modal && (
         <Modal
-          title={modal === 'add' ? 'Add Department' : `Edit — ${editRow.code}`}
-          subtitle={modal === 'edit' ? editRow.name : undefined}
+          title={modal === 'add' ? `Add ${activeNav.slice(0, -1)}` : `Edit ${activeNav.slice(0, -1)}`}
+          subtitle={modal === 'edit' ? (editRow?.name || editRow?.code || editRow?.number) : undefined}
           onClose={() => setModal(null)}
         >
           <div className="space-y-4">
-            <Field label="Department Code"  value={modal === 'edit' ? editRow.code : ''}  onChange={() => {}} required />
-            <Field label="Department Name"  value={modal === 'edit' ? editRow.name : ''}  onChange={() => {}} required />
-            <Field label="Head of Department (HOD)" value={modal === 'edit' ? editRow.hod : ''} onChange={() => {}} required />
+            <Field label="Code / Title"  value={modal === 'edit' ? (editRow?.code || editRow?.number || editRow?.name || '') : ''}  onChange={() => {}} required />
+            <Field label="Name / Detail"  value={modal === 'edit' ? (editRow?.name || editRow?.building || editRow?.hod || '') : ''}  onChange={() => {}} required />
             <div className="flex justify-end gap-2 pt-2">
               <button onClick={() => setModal(null)} className={secondaryButton}>Cancel</button>
               <button onClick={() => { setModal(null); setToast(true) }} className={primaryButton}>
@@ -309,6 +410,7 @@ export function TimetablePage() {
           </div>
           <button
             disabled={!selected.length}
+            onClick={() => setEditing(timetableRows[0])}
             className={`${secondaryButton} disabled:cursor-not-allowed disabled:opacity-50`}
           >
             Edit Selected ({selected.length})
@@ -555,7 +657,7 @@ export function TimetableImportPage() {
                           <StatusBadge tone={r.status === 'Success' ? 'green' : 'red'}>{r.status}</StatusBadge>
                         </td>
                         <td className="px-5 py-[13px]">
-                          <button className="text-[12.5px] font-medium transition-colors hover:underline" style={{ color: C.blue }}>View</button>
+                          <button onClick={() => setPreview(true)} className="text-[12.5px] font-medium transition-colors hover:underline" style={{ color: C.blue }}>View</button>
                         </td>
                       </tr>
                     ))}
@@ -586,7 +688,7 @@ export function TimetableImportPage() {
                     <p className="text-[13px]" style={{ color: C.textSecondary }}>{tip}</p>
                   </div>
                 ))}
-                <button className={`${secondaryButton} w-full mt-2`}>
+                <button onClick={() => setImported(true)} className={`${secondaryButton} w-full mt-2`}>
                   <FileSpreadsheet className="size-4" /> Download Template
                 </button>
               </div>
@@ -848,7 +950,7 @@ export function StudentProfilePage() {
                   <StatusBadge tone="green">Active</StatusBadge>
                   <StatusBadge tone="blue">Linked</StatusBadge>
                 </div>
-                <button className={`${secondaryButton} mt-4 w-full`}>View Full Profile</button>
+                <button onClick={() => setActiveTab('academic')} className={`${secondaryButton} mt-4 w-full`}>View Full Profile</button>
               </div>
 
               <div style={{ borderTop: `1px solid ${C.border}` }}>

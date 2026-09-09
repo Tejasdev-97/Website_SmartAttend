@@ -200,7 +200,7 @@ export function UsersRolesPage() {
                         <button onClick={() => setModal(true)} className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-[#EAF3FF]" style={{ borderColor: C.border, color: C.blue }}>
                           <Edit3 className="size-3.5" /> Edit
                         </button>
-                        <button className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-red-50" style={{ borderColor: '#FECACA', color: C.red }}>
+                        <button onClick={() => setToast(true)} className="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium hover:bg-red-50" style={{ borderColor: '#FECACA', color: C.red }}>
                           <Trash2 className="size-3.5" />
                         </button>
                       </div>
@@ -260,7 +260,10 @@ const actionTone: Record<string, 'blue' | 'green' | 'orange' | 'red' | 'purple'>
 }
 
 export function AuditLogsPage() {
-  const [query, setQuery] = useState('')
+  const [query, setQuery]           = useState('')
+  const [activePage, setActivePage] = useState(1)
+  const [toast, setToast]           = useState(false)
+
   const filtered = auditLogs.filter(e =>
     [e.action, e.user, e.module, e.details].join(' ').toLowerCase().includes(query.toLowerCase())
   )
@@ -272,7 +275,7 @@ export function AuditLogsPage() {
           title="Audit Logs"
           description="Track all important activities performed in the system."
           actions={
-            <button className={secondaryButton}>
+            <button onClick={() => setToast(true)} className={secondaryButton}>
               <Download className="size-4" /> Export Logs
             </button>
           }
@@ -355,14 +358,20 @@ export function AuditLogsPage() {
               Showing <span className="font-semibold" style={{ color: C.navy }}>{filtered.length}</span> of <span className="font-semibold" style={{ color: C.navy }}>248</span> entries
             </p>
             <div className="flex gap-1">
-              {[1, 2, 3, '…', 32].map((p, i) => (
-                <button key={i} className="flex size-8 items-center justify-center rounded-lg text-[13px] font-medium" style={p === 1 ? { background: C.blue, color: C.white } : { color: C.textSecondary }}>
+              {[1, 2, 3, 4, 5].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setActivePage(p)}
+                  className="flex size-8 items-center justify-center rounded-lg text-[13px] font-medium"
+                  style={activePage === p ? { background: C.blue, color: C.white } : { color: C.textSecondary }}
+                >
                   {p}
                 </button>
               ))}
             </div>
           </div>
         </Panel>
+        {toast && <Toast message="Audit logs exported successfully." />}
       </AdminContent>
     </AdminShell>
   )
@@ -396,7 +405,7 @@ export function ReportsPage() {
           actions={
             <>
               <input type="date" className="h-10 rounded-lg border bg-white px-3 text-[13.5px] outline-none" style={{ borderColor: C.border, color: C.textPrimary }} />
-              <button className={primaryButton}>
+              <button onClick={() => setToast('Full Attendance & Academic Reports Package (ZIP)')} className={primaryButton}>
                 <Download className="size-4" /> Export Reports
               </button>
             </>
@@ -600,8 +609,10 @@ export function SettingsPage() {
             <Panel>
               <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.border}` }}>
                 <div>
-                  <h2 className="text-[16px] font-semibold" style={{ color: C.navy }}>Institution Information</h2>
-                  <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>Manage your college details and branding.</p>
+                  <h2 className="text-[16px] font-semibold" style={{ color: C.navy }}>
+                    {settingsSidebar.find(s => s.key === activeSection)?.label || 'Institution Information'}
+                  </h2>
+                  <p className="mt-0.5 text-[13px]" style={{ color: C.textTertiary }}>Configure institutional preferences and parameters.</p>
                 </div>
                 <button onClick={() => setSaved(true)} className={primaryButton}>
                   <Save className="size-4" /> Save Changes
@@ -640,7 +651,7 @@ export function SettingsPage() {
                   >
                     <Shield className="size-12" style={{ color: C.blue }} />
                   </div>
-                  <button className={`${secondaryButton} mt-3 w-full text-[12.5px]`}>
+                  <button onClick={() => setSaved(true)} className={`${secondaryButton} mt-3 w-full text-[12.5px]`}>
                     Change Logo
                   </button>
                 </div>

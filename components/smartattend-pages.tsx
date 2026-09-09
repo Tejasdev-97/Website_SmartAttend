@@ -478,9 +478,11 @@ const students = [
 
 export function StudentsPage() {
   const router = useRouter()
-  const [query,   setQuery]   = useState('')
-  const [dept,    setDept]    = useState('')
-  const [status,  setStatus]  = useState('')
+  const [query,      setQuery]      = useState('')
+  const [dept,       setDept]       = useState('')
+  const [status,     setStatus]     = useState('')
+  const [activePage, setActivePage] = useState(1)
+
   const filtered = useMemo(
     () => students.filter(s =>
       (s.name + s.usn).toLowerCase().includes(query.toLowerCase()) &&
@@ -498,7 +500,7 @@ export function StudentsPage() {
           description="Manage student accounts, academic information and registered devices."
           actions={
             <>
-              <button className={secondaryButton}>
+              <button onClick={() => router.push('/admin/students/create')} className={secondaryButton}>
                 <Upload className="size-4" /> Import Excel / CSV
               </button>
               <button onClick={() => router.push('/admin/students/create')} className={primaryButton}>
@@ -635,12 +637,13 @@ export function StudentsPage() {
               <span className="font-semibold" style={{ color: C.navy }}>2,856</span>
             </p>
             <div className="flex items-center gap-1">
-              {[1, 2, 3, '…', 12].map((p, i) => (
+              {[1, 2, 3, 4, 5].map((p) => (
                 <button
-                  key={i}
+                  key={p}
+                  onClick={() => setActivePage(p)}
                   className="flex size-8 items-center justify-center rounded-lg text-[13px] font-medium transition-colors"
                   style={
-                    p === 1
+                    activePage === p
                       ? { background: C.blue, color: C.white }
                       : { color: C.textSecondary, background: 'transparent' }
                   }
@@ -716,7 +719,7 @@ export function CreateStudentPage() {
                 <input type="file" accept=".xlsx,.csv" className="sr-only"
                   onChange={e => setFile(e.target.files?.[0]?.name || file)} />
               </label>
-              <button className={primaryButton}>Review Imported Data</button>
+              <button onClick={() => setCreated(true)} className={primaryButton}>Review Imported Data</button>
             </div>
           </div>
         </Panel>
